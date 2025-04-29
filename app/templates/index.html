@@ -3,80 +3,80 @@
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
-<!-- Typed.js CDN -->
+
 <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<style>
-    body, html {
-        height: 100%;
-        margin: 0;
-    }
+<div class="container-fluid vh-100 d-flex p-0 bg-black text-white position-relative">
 
-    .hero-section {
-        background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        height: 100vh;
-        color: white;
-        padding: 0 20px;
-        animation: fadeIn 1.5s ease-in;
-    }
+  <!-- the left side content -->
+  <div class="d-flex flex-column justify-content-center ps-5 hero-left">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="display-4">
+          <span id="typed-text"></span>
+        </h1>
+        <ul class="team-list">
+          <li>Xu Li 24269773</li>
+          <li>Fei Han 24495786</li>
+          <li>Arthur Zhang 24389999</li>
+          <li>Harshit Gadhiya 23981757</li>
+        </ul>
+      </div>
+      <a class="btn btn-primary btn-lg mt-3" href="{{ url_for('main.login') }}">Let's Go</a>
+    </div>
+  </div>
 
-    h1.display-4 {
-        font-weight: 700;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    }
+  <!-- the right side pic -->
+  <div class="d-flex flex-column justify-content-center align-items-center hero-right">
+    <div class="hero-bg position-absolute top-0 start-0 w-100 h-100"></div>
+  </div>
 
-    p.lead {
-        font-size: 1.5rem;
-        margin-top: 20px;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-        border-radius: 50px;
-        padding: 12px 30px;
-        font-size: 1.2rem;
-        margin-top: 30px;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        background-color: #0056b3;
-        transform: translateY(-3px);
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-</style>
-
-<div class="hero-section">
-    <h1 class="display-4">
-        <span id="typed-text"></span>
-    </h1>
-    <p class="lead">Track your exercise, diet, and sleep — and stay healthy 💪</p>
-    <a class="btn btn-primary btn-lg mt-3" href="{{ url_for('main.login') }}">Get Started</a>
 </div>
 
-<script>
-    var typed = new Typed('#typed-text', {
-        strings: [
-            "Welcome to Fitness Tracker!",
-            "Track Your Fitness Journey!",
-            "Stay Healthy. Stay Strong!"
-        ],
-        typeSpeed: 50,
-        backSpeed: 30,
-        backDelay: 2000,
-        loop: true
-    });
-</script>
+<section class="features-section">
+  <h2>Meet your personalized wellness expert</h2>
+  <div class="d-flex justify-content-between gap-4 flex-wrap container">
+    <div class="feature-column">
+      <h3>Document your data</h3>
+      <ul>
+        <li>Upload your exercise record</li>
+        <li>Upload your diet records</li>
+        <li>Upload your sleep records</li>
+        <li>Log your energy levels</li>
+      </ul>
+    </div>
+    <div class="feature-column">
+      <h3>Analyze your data</h3>
+      <ul>
+        <li>Visualize trends through charts & graphs</li>
+        <li>AI-powered analysis to detect anomalies</li>
+        <li>Personalized health suggestions powered by large language models</li>
+        <li>Track your progress</li>
+      </ul>
+    </div>
+    <div class="feature-column">
+      <h3>Share and stay motivated</h3>
+      <ul>
+        <li>Share your progress with friends</li>
+        <li>Comment and react to others’ logs</li>
+        <li>Export and share detailed reports</li>
+
+      </ul>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center gap-3 flex-wrap mt-3">
+    <a href="{{ url_for('main.dashboard') if logged_in else url_for('main.login') }}" class="btn btn-outline">Explore All Features →</a>
+  </div>
+</section>
+<footer class="site-footer bg-dark text-light text-center py-4 mt-5">
+  <div class="container">
+    <p class="mb-1">© 2025 FitTracker. All rights reserved.</p>
+    <p class="small">Empowering your fitness journey, one step at a time.</p>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
 {% endblock %}
