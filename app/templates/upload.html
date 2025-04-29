@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Upload Data{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4">Upload Your Fitness Data</h1>
+<p class="text-center text-muted">Choose a category and enter your latest health data.</p>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4 justify-content-center" id="uploadTabs" role="tablist">
+  <li class="nav-item">
+    <button class="nav-link active" id="exercise-tab" data-bs-toggle="tab" data-bs-target="#exercise" type="button" role="tab">🏋️ Exercise</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" id="diet-tab" data-bs-toggle="tab" data-bs-target="#diet" type="button" role="tab">🍽️ Diet</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" id="sleep-tab" data-bs-toggle="tab" data-bs-target="#sleep" type="button" role="tab">😴 Sleep</button>
+  </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="uploadTabsContent">
+  <!-- Exercise Form -->
+  <div class="tab-pane fade show active" id="exercise" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" class="p-4 border rounded shadow-sm bg-light">
+      <div class="mb-3">
+        <label class="form-label">Workout Type</label>
+        <select class="form-select" name="workout_type" required>
+          <option value="" selected disabled>Select workout</option>
+          <option>Walking</option>
+          <option>Running</option>
+          <option>Biking</option>
+          <option>Hiking</option>
+          <option>Pool Swim</option>
+          <option>Treadmill</option>
+          <option>Weight Machine</option>
+          <option>Yoga</option>
+          <option>Other Workout</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Duration (minutes)</label>
+        <input type="number" name="duration" class="form-control" min="1" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Calories Burned</label>
+        <input type="number" name="calories" class="form-control" min="0">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Notes (optional)</label>
+        <textarea name="notes" class="form-control" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Save Exercise</button>
+    </form>
+  </div>
+
+
+<!-- Diet Tab -->
+<div class="tab-pane fade" id="diet" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" class="p-4 border rounded shadow-sm bg-light mt-3">
+      <div class="mb-3">
+        <label class="form-label">Meal Type</label>
+        <select class="form-select" name="meal_type" required>
+          <option selected disabled>Select meal</option>
+          <option>Breakfast</option>
+          <option>Lunch</option>
+          <option>Dinner</option>
+          <option>Snack</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Food Name</label>
+        <input type="text" name="food_name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Calories</label>
+        <input type="number" name="diet_calories" class="form-control" min="0" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="diet_date" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Notes (optional)</label>
+        <textarea name="diet_notes" class="form-control" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-warning w-100">Save Diet Entry</button>
+    </form>
+  </div>
+
+  
+  <!-- Sleep Tab -->
+<div class="tab-pane fade" id="sleep" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" class="p-4 border rounded shadow-sm bg-light mt-3">
+      <div class="mb-3">
+        <label class="form-label">Sleep Start</label>
+        <input type="datetime-local" name="sleep_start" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep End</label>
+        <input type="datetime-local" name="sleep_end" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep Quality</label>
+        <select class="form-select" name="sleep_quality" required>
+          <option selected disabled>Select quality</option>
+          <option>Poor</option>
+          <option>Fair</option>
+          <option>Good</option>
+          <option>Excellent</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Notes (optional)</label>
+        <textarea name="sleep_notes" class="form-control" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-info w-100">Save Sleep Entry</button>
+    </form>
+  </div>
+  
+{% endblock %}

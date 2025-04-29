@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Animate on scroll library (for fade-in animations) -->
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<style>
+  .dashboard-title {
+    font-weight: 700;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+  }
+  
+  .card-custom {
+    border: none;
+    border-radius: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+    color: white;
+  }
+
+  .card-custom:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+  }
+
+  .card-custom.bg-dark {
+    background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+  }
+
+  .card-custom.bg-primary {
+    background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%);
+  }
+
+  .card-custom.bg-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+
+  .card-custom.bg-warning {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    color: black;
+  }
+
+  .card-custom.bg-info {
+    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+  }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+  <h1 class="dashboard-title text-dark" data-aos="fade-down" data-aos-duration="1000">Welcome to Your Dashboard</h1>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <div class="col" data-aos="fade-up" data-aos-delay="100">
+    <a href="{{ url_for('main.upload') }}" class="text-decoration-none">
+      <div class="card card-custom bg-dark shadow-sm h-100 text-center p-4">
+        <h4 class="card-title">📤 Upload Data</h4>
+        <p class="card-text">Submit your exercise, diet, or sleep data</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="col" data-aos="fade-up" data-aos-delay="200">
+    <a href="#" class="text-decoration-none">
+      <div class="card card-custom bg-primary shadow-sm h-100 text-center p-4">
+        <h4 class="card-title">📊 Analyze Data</h4>
+        <p class="card-text">View stats and trends</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="col" data-aos="fade-up" data-aos-delay="300">
+    <a href="{{ url_for('main.exercise_records') }}" class="text-decoration-none">
+      <div class="card card-custom bg-success shadow-sm h-100 text-center p-4">
+        <h4 class="card-title">🏋️ Exercise Records</h4>
+        <p class="card-text">View all your workouts</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="col" data-aos="fade-up" data-aos-delay="400">
+    <a href="{{ url_for('main.diet_records') }}" class="text-decoration-none">
+      <div class="card card-custom bg-warning shadow-sm h-100 text-center p-4">
+        <h4 class="card-title">🍽️ Diet Records</h4>
+        <p class="card-text">See what you’ve eaten</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="col" data-aos="fade-up" data-aos-delay="500">
+    <a href="{{ url_for('main.sleep_records') }}" class="text-decoration-none">
+      <div class="card card-custom bg-info shadow-sm h-100 text-center p-4">
+        <h4 class="card-title">💤 Sleep Records</h4>
+        <p class="card-text">Review your sleep history</p>
+      </div>
+    </a>
+  </div>
+</div>
+
+<script>
+  AOS.init(); // initialize animations
+</script>
+
+{% endblock %}

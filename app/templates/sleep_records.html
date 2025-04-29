@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Sleep Records{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Your Sleep Records</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Sleep Start</th>
+      <th>Sleep End</th>
+      <th>Quality</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in records %}
+    <tr>
+      <td>{{ entry.sleep_start }}</td>
+      <td>{{ entry.sleep_end }}</td>
+      <td>{{ entry.sleep_quality }}</td>
+      <td>{{ entry.notes }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

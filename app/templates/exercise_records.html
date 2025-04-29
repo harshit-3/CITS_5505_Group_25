@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Exercise Records{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Your Exercise Records</h2>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Workout</th>
+      <th>Duration (min)</th>
+      <th>Calories</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in records %}
+    <tr>
+      <td>{{ entry.date }}</td>
+      <td>{{ entry.workout_type }}</td>
+      <td>{{ entry.duration }}</td>
+      <td>{{ entry.calories }}</td>
+      <td>{{ entry.notes }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

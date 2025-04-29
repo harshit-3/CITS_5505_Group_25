@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<!-- Typed.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 100vh;
+        color: white;
+        padding: 0 20px;
+        animation: fadeIn 1.5s ease-in;
+    }
+
+    h1.display-4 {
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    p.lead {
+        font-size: 1.5rem;
+        margin-top: 20px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-size: 1.2rem;
+        margin-top: 30px;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-3px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+</style>
+
+<div class="hero-section">
+    <h1 class="display-4">
+        <span id="typed-text"></span>
+    </h1>
+    <p class="lead">Track your exercise, diet, and sleep — and stay healthy 💪</p>
+    <a class="btn btn-primary btn-lg mt-3" href="{{ url_for('main.login') }}">Get Started</a>
+</div>
+
+<script>
+    var typed = new Typed('#typed-text', {
+        strings: [
+            "Welcome to Fitness Tracker!",
+            "Track Your Fitness Journey!",
+            "Stay Healthy. Stay Strong!"
+        ],
+        typeSpeed: 50,
+        backSpeed: 30,
+        backDelay: 2000,
+        loop: true
+    });
+</script>
+
+{% endblock %}
