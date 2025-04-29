@@ -4,48 +4,10 @@
 {% block content %}
 <!-- Animate on scroll library (for fade-in animations) -->
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 
-<style>
-  .dashboard-title {
-    font-weight: 700;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
-  }
-  
-  .card-custom {
-    border: none;
-    border-radius: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-    color: white;
-  }
-
-  .card-custom:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-  }
-
-  .card-custom.bg-dark {
-    background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
-  }
-
-  .card-custom.bg-primary {
-    background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%);
-  }
-
-  .card-custom.bg-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  }
-
-  .card-custom.bg-warning {
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-    color: black;
-  }
-
-  .card-custom.bg-info {
-    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-  }
-</style>
 
 <div class="d-flex justify-content-between align-items-center mb-5">
   <h1 class="dashboard-title text-dark" data-aos="fade-down" data-aos-duration="1000">Welcome to Your Dashboard</h1>
