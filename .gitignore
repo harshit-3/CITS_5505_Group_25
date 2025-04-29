@@ -1,0 +1,13 @@
+# Python cache files
+__pycache__/
+*.pyc
+
+# PyCharm project settings
+.idea/
+*.iml
+
+# Database files (if any)
+*.db
+
+# macOS system files
+.DS_Store
