@@ -7,7 +7,7 @@ main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html",logged_in= ("user_id" in session))
 
 
 @main.route("/register", methods=["GET", "POST"])
