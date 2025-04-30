@@ -164,3 +164,17 @@ def sleep_records():
     records = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start.desc()).all()
     return render_template("sleep_records.html", records=records)
 
+
+@main.route("/analysis")
+def analysis():
+    if "user_id" not in session:
+        flash("Please log in to view analysis.", "warning")
+        return redirect(url_for("main.login"))
+    return render_template("analysis.html")
+
+@main.route("/share")
+def share():
+    if "user_id" not in session:
+        flash("Please log in to share your progress.", "warning")
+        return redirect(url_for("main.login"))
+    return render_template("share.html")

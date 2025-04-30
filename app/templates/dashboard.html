@@ -30,7 +30,7 @@
 
     <!-- Analyze Data Card -->
     <div class="col" data-aos="zoom-in" data-aos-delay="200">
-      <a href="#" class="text-decoration-none">
+      <a href="{{ url_for('main.analysis') }}" class="text-decoration-none">
         <div class="card card-custom bg-primary shadow-lg h-100 text-center p-4">
           <div class="card-icon">📊</div>
           <h4 class="card-title">Analyze Data</h4>
@@ -68,6 +68,17 @@
           <div class="card-icon">💤</div>
           <h4 class="card-title">Sleep Records</h4>
           <p class="card-text">Review your sleep history</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Share Progress Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="600">
+      <a href="{{ url_for('main.share') }}" class="text-decoration-none">
+        <div class="card card-custom bg-secondary shadow-lg h-100 text-center p-4">
+          <div class="card-icon">🔗</div>
+          <h4 class="card-title">Share Progress</h4>
+          <p class="card-text">Generate and share your fitness reports</p>
         </div>
       </a>
     </div>

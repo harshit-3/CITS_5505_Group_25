@@ -24,7 +24,7 @@
           <li>Harshit Gadhiya 23981757</li>
         </ul>
       </div>
-      <a class="btn btn-primary btn-lg mt-3" href="{{ url_for('main.login') }}">Let's Go</a>
+      <a class="btn btn-primary btn-lg mt-3" href="{{ url_for('main.dashboard') if logged_in else url_for('main.login') }}">Let's Go</a>
     </div>
   </div>
 
@@ -79,4 +79,4 @@
 
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 
-{% endblock %}
+{% endblock %}  
