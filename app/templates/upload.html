@@ -7,6 +7,40 @@
 <h1 class="text-center mb-4">Upload Your Fitness Data</h1>
 <p class="text-center text-muted">Choose a category and enter your latest health data or upload a CSV file.</p>
 
+<!-- Unified CSV Upload Form -->
+<form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
+  <input type="hidden" name="category" id="csvCategory" value="exercise">
+  
+  <div class="row justify-content-center mb-2 align-items-end">
+    <!-- File Input (left or center) -->
+    <div class="col-md-6">
+      <label class="form-label">Upload CSV (auto-selects based on tab)</label>
+      <input type="file" name="csv_file" class="form-control" required>
+    </div>
+
+    <!-- Submit Button (right aligned) -->
+    <div class="col-md-2 text-end mt-4">
+      <button type="submit" class="btn btn-success">Upload CSV</button>
+    </div>
+  </div>
+</form>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const hiddenInput = document.getElementById("csvCategory");
+
+    const tabButtons = document.querySelectorAll("#uploadTabs button");
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const selectedTab = button.getAttribute("data-bs-target").substring(1); // "exercise", "diet", "sleep"
+        hiddenInput.value = selectedTab;
+      });
+    });
+  });
+</script>
+
+
 <!-- Tabs -->
 <ul class="nav nav-tabs mb-4 justify-content-center" id="uploadTabs" role="tablist">
   <li class="nav-item">
@@ -72,10 +106,6 @@
         <label class="form-label">Notes (optional)</label>
         <textarea name="notes" class="form-control" rows="2"></textarea>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Upload CSV (optional)</label>
-        <input type="file" name="exercise_file" class="form-control">
-      </div>
       <button type="submit" class="btn btn-primary w-100">Save Exercise</button>
     </form>
   </div>
@@ -129,10 +159,6 @@
         <label class="form-label">Notes (optional)</label>
         <textarea name="diet_notes" class="form-control" rows="2"></textarea>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Upload CSV (optional)</label>
-        <input type="file" name="diet_file" class="form-control">
-      </div>
       <button type="submit" class="btn btn-warning w-100">Save Diet Entry</button>
     </form>
   </div>
@@ -177,10 +203,6 @@
       <div class="mb-3">
         <label class="form-label">Notes (optional)</label>
         <textarea name="sleep_notes" class="form-control" rows="2"></textarea>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Upload CSV (optional)</label>
-        <input type="file" name="sleep_file" class="form-control">
       </div>
       <button type="submit" class="btn btn-info w-100">Save Sleep Entry</button>
     </form>

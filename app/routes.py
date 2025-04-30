@@ -86,11 +86,23 @@ def upload():
     if request.method == "POST":
         user_id = session["user_id"]
 
-        # Handle Exercise Entry
-        if "workout_type" in request.form:
-            if 'exercise_file' in request.files and request.files['exercise_file'].filename:
-                file = request.files['exercise_file']
+        # 🔍 Unified CSV file handling based on tab category
+        if 'csv_file' in request.files and 'category' in request.form:
+            file = request.files['csv_file']
+            category = request.form['category']
+
+            if not file or file.filename == '':
+                flash("No file selected.", "warning")
+                return redirect(url_for("main.upload"))
+
+            import pandas as pd
+            try:
                 df = pd.read_csv(file)
+            except Exception:
+                flash("Invalid CSV format.", "danger")
+                return redirect(url_for("main.upload"))
+
+            if category == "exercise":
                 for _, row in df.iterrows():
                     entry = ExerciseEntry(
                         user_id=user_id,
@@ -106,27 +118,8 @@ def upload():
                     db.session.add(entry)
                 db.session.commit()
                 flash("Exercise data uploaded from CSV!", "success")
-            else:
-                entry = ExerciseEntry(
-                    user_id=user_id,
-                    workout_type=request.form["workout_type"],
-                    intensity=request.form.get("intensity"),
-                    duration=request.form.get("duration"),
-                    distance=request.form.get("distance"),
-                    calories=request.form.get("calories"),
-                    heart_rate=request.form.get("heart_rate"),
-                    date=request.form["date"],
-                    notes=request.form.get("notes", "")
-                )
-                db.session.add(entry)
-                db.session.commit()
-                flash("Exercise entry saved!", "success")
 
-        # Handle Diet Entry
-        elif "meal_type" in request.form:
-            if 'diet_file' in request.files and request.files['diet_file'].filename:
-                file = request.files['diet_file']
-                df = pd.read_csv(file)
+            elif category == "diet":
                 for _, row in df.iterrows():
                     entry = DietEntry(
                         user_id=user_id,
@@ -144,29 +137,8 @@ def upload():
                     db.session.add(entry)
                 db.session.commit()
                 flash("Diet data uploaded from CSV!", "success")
-            else:
-                entry = DietEntry(
-                    user_id=user_id,
-                    meal_type=request.form["meal_type"],
-                    food_name=request.form["food_name"],
-                    calories=request.form["diet_calories"],
-                    meal_time=request.form.get("meal_time"),
-                    protein=request.form.get("protein"),
-                    carbs=request.form.get("carbs"),
-                    fats=request.form.get("fats"),
-                    water=request.form.get("water"),
-                    date=request.form["diet_date"],
-                    notes=request.form.get("diet_notes", "")
-                )
-                db.session.add(entry)
-                db.session.commit()
-                flash("Diet entry saved!", "success")
 
-        # Handle Sleep Entry
-        elif "sleep_start" in request.form:
-            if 'sleep_file' in request.files and request.files['sleep_file'].filename:
-                file = request.files['sleep_file']
-                df = pd.read_csv(file)
+            elif category == "sleep":
                 for _, row in df.iterrows():
                     entry = SleepEntry(
                         user_id=user_id,
@@ -181,24 +153,68 @@ def upload():
                     db.session.add(entry)
                 db.session.commit()
                 flash("Sleep data uploaded from CSV!", "success")
+
             else:
-                entry = SleepEntry(
-                    user_id=user_id,
-                    sleep_start=request.form["sleep_start"],
-                    sleep_end=request.form["sleep_end"],
-                    sleep_quality=request.form["sleep_quality"],
-                    wake_ups=request.form.get("wake_ups"),
-                    efficiency=request.form.get("efficiency"),
-                    sleep_type=request.form.get("sleep_type"),
-                    notes=request.form.get("sleep_notes", "")
-                )
-                db.session.add(entry)
-                db.session.commit()
-                flash("Sleep entry saved!", "success")
+                flash("Invalid upload category.", "danger")
+
+            return redirect(url_for("main.upload"))
+
+        # 🧾 Manual Form Input: Exercise
+        elif "workout_type" in request.form:
+            entry = ExerciseEntry(
+                user_id=user_id,
+                workout_type=request.form["workout_type"],
+                intensity=request.form.get("intensity"),
+                duration=request.form.get("duration"),
+                distance=request.form.get("distance"),
+                calories=request.form.get("calories"),
+                heart_rate=request.form.get("heart_rate"),
+                date=request.form["date"],
+                notes=request.form.get("notes", "") or "None"
+            )
+            db.session.add(entry)
+            db.session.commit()
+            flash("Exercise entry saved!", "success")
+
+        # 🧾 Manual Form Input: Diet
+        elif "meal_type" in request.form:
+            entry = DietEntry(
+                user_id=user_id,
+                meal_type=request.form["meal_type"],
+                food_name=request.form["food_name"],
+                calories=request.form["diet_calories"],
+                meal_time=request.form.get("meal_time"),
+                protein=request.form.get("protein"),
+                carbs=request.form.get("carbs"),
+                fats=request.form.get("fats"),
+                water=request.form.get("water"),
+                date=request.form["diet_date"],
+                notes=request.form.get("diet_notes", "") or "None"
+            )
+            db.session.add(entry)
+            db.session.commit()
+            flash("Diet entry saved!", "success")
+
+        # 🧾 Manual Form Input: Sleep
+        elif "sleep_start" in request.form:
+            entry = SleepEntry(
+                user_id=user_id,
+                sleep_start=request.form["sleep_start"],
+                sleep_end=request.form["sleep_end"],
+                sleep_quality=request.form["sleep_quality"],
+                wake_ups=request.form.get("wake_ups"),
+                efficiency=request.form.get("efficiency"),
+                sleep_type=request.form.get("sleep_type"),
+                notes=request.form.get("sleep_notes", "") or "None"
+            )
+            db.session.add(entry)
+            db.session.commit()
+            flash("Sleep entry saved!", "success")
 
         return redirect(url_for("main.upload"))
 
     return render_template("upload.html")
+
 
 
 @main.route("/logout")
