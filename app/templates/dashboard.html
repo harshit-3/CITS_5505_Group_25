@@ -2,66 +2,83 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<!-- Animate on scroll library (for fade-in animations) -->
+<!-- Animate on scroll library -->
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 
+<!-- Header Section -->
+<header class="header-container" data-aos="fade-down" data-aos-duration="1000">
+  <h1 class="dashboard-title">Welcome to Your Dashboard</h1>
+  <p class="dashboard-subtitle">Track your fitness journey with ease</p>
+</header>
 
-<div class="d-flex justify-content-between align-items-center mb-5">
-  <h1 class="dashboard-title text-dark" data-aos="fade-down" data-aos-duration="1000">Welcome to Your Dashboard</h1>
-</div>
+<!-- Main Content -->
+<main class="container mt-5">
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5">
+    <!-- Upload Data Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="100">
+      <a href="{{ url_for('main.upload') }}" class="text-decoration-none">
+        <div class="card card-custom bg-dark shadow-lg h-100 text-center p-4">
+          <div class="card-icon">📤</div>
+          <h4 class="card-title">Upload Data</h4>
+          <p class="card-text">Submit your exercise, diet, or sleep data</p>
+        </div>
+      </a>
+    </div>
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-  <div class="col" data-aos="fade-up" data-aos-delay="100">
-    <a href="{{ url_for('main.upload') }}" class="text-decoration-none">
-      <div class="card card-custom bg-dark shadow-sm h-100 text-center p-4">
-        <h4 class="card-title">📤 Upload Data</h4>
-        <p class="card-text">Submit your exercise, diet, or sleep data</p>
-      </div>
-    </a>
+    <!-- Analyze Data Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="200">
+      <a href="#" class="text-decoration-none">
+        <div class="card card-custom bg-primary shadow-lg h-100 text-center p-4">
+          <div class="card-icon">📊</div>
+          <h4 class="card-title">Analyze Data</h4>
+          <p class="card-text">View stats and trends</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Exercise Records Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="300">
+      <a href="{{ url_for('main.exercise_records') }}" class="text-decoration-none">
+        <div class="card card-custom bg-success shadow-lg h-100 text-center p-4">
+          <div class="card-icon">🏋️</div>
+          <h4 class="card-title">Exercise Records</h4>
+          <p class="card-text">View all your workouts</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Diet Records Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="400">
+      <a href="{{ url_for('main.diet_records') }}" class="text-decoration-none">
+        <div class="card card-custom bg-warning shadow-lg h-100 text-center p-4">
+          <div class="card-icon">🍽️</div>
+          <h4 class="card-title">Diet Records</h4>
+          <p class="card-text">See what you’ve eaten</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Sleep Records Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="500">
+      <a href="{{ url_for('main.sleep_records') }}" class="text-decoration-none">
+        <div class="card card-custom bg-info shadow-lg h-100 text-center p-4">
+          <div class="card-icon">💤</div>
+          <h4 class="card-title">Sleep Records</h4>
+          <p class="card-text">Review your sleep history</p>
+        </div>
+      </a>
+    </div>
   </div>
-
-  <div class="col" data-aos="fade-up" data-aos-delay="200">
-    <a href="#" class="text-decoration-none">
-      <div class="card card-custom bg-primary shadow-sm h-100 text-center p-4">
-        <h4 class="card-title">📊 Analyze Data</h4>
-        <p class="card-text">View stats and trends</p>
-      </div>
-    </a>
-  </div>
-
-  <div class="col" data-aos="fade-up" data-aos-delay="300">
-    <a href="{{ url_for('main.exercise_records') }}" class="text-decoration-none">
-      <div class="card card-custom bg-success shadow-sm h-100 text-center p-4">
-        <h4 class="card-title">🏋️ Exercise Records</h4>
-        <p class="card-text">View all your workouts</p>
-      </div>
-    </a>
-  </div>
-
-  <div class="col" data-aos="fade-up" data-aos-delay="400">
-    <a href="{{ url_for('main.diet_records') }}" class="text-decoration-none">
-      <div class="card card-custom bg-warning shadow-sm h-100 text-center p-4">
-        <h4 class="card-title">🍽️ Diet Records</h4>
-        <p class="card-text">See what you’ve eaten</p>
-      </div>
-    </a>
-  </div>
-
-  <div class="col" data-aos="fade-up" data-aos-delay="500">
-    <a href="{{ url_for('main.sleep_records') }}" class="text-decoration-none">
-      <div class="card card-custom bg-info shadow-sm h-100 text-center p-4">
-        <h4 class="card-title">💤 Sleep Records</h4>
-        <p class="card-text">Review your sleep history</p>
-      </div>
-    </a>
-  </div>
-</div>
+</main>
 
 <script>
-  AOS.init(); // initialize animations
+  AOS.init({
+    duration: 800,
+    once: true
+  });
 </script>
 
 {% endblock %}
