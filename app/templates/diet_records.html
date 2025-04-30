@@ -3,26 +3,40 @@
 
 {% block content %}
 <h2 class="mb-4">Your Diet Records</h2>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Meal Type</th>
-      <th>Food Name</th>
-      <th>Calories</th>
-      <th>Notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for entry in records %}
-    <tr>
-      <td>{{ entry.date }}</td>
-      <td>{{ entry.meal_type }}</td>
-      <td>{{ entry.food_name }}</td>
-      <td>{{ entry.calories }}</td>
-      <td>{{ entry.notes }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-responsive"></div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Meal Type</th>
+        <th>Food Name</th>
+        <th>Calories</th>
+        <th>Notes</th>
+        <th>Time</th>
+        <th>Protein (g)</th>
+        <th>Carbs (g)</th>
+        <th>Fats (g)</th>
+        <th>Water (ml)</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in records %}
+      <tr>
+        <td>{{ entry.date }}</td>
+        <td>{{ entry.meal_type }}</td>
+        <td>{{ entry.food_name }}</td>
+        <td>{{ entry.calories }}</td>
+        <td>{{ entry.notes }}</td>
+        <td>{{ entry.meal_time }}</td>
+        <td>{{ entry.protein }}</td>
+        <td>{{ entry.carbs }}</td>
+        <td>{{ entry.fats }}</td>
+        <td>{{ entry.water }}</td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

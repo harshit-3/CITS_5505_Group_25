@@ -3,24 +3,34 @@
 
 {% block content %}
 <h2 class="mb-4">Your Sleep Records</h2>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Sleep Start</th>
-      <th>Sleep End</th>
-      <th>Quality</th>
-      <th>Notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for entry in records %}
-    <tr>
-      <td>{{ entry.sleep_start }}</td>
-      <td>{{ entry.sleep_end }}</td>
-      <td>{{ entry.sleep_quality }}</td>
-      <td>{{ entry.notes }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="table-responsive"></div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Sleep Start</th>
+        <th>Sleep End</th>
+        <th>Quality</th>
+        <th>Notes</th>
+        <th>Wake-ups</th>
+        <th>Efficiency (%)</th>
+        <th>Sleep Type</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in records %}
+      <tr>
+        <td>{{ entry.sleep_start }}</td>
+        <td>{{ entry.sleep_end }}</td>
+        <td>{{ entry.sleep_quality }}</td>
+        <td>{{ entry.notes }}</td>
+        <td>{{ entry.wake_ups }}</td>
+        <td>{{ entry.efficiency }}</td>
+        <td>{{ entry.sleep_type }}</td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}
