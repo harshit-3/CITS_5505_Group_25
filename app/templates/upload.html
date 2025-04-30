@@ -2,8 +2,10 @@
 {% block title %}Upload Data{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+
 <h1 class="text-center mb-4">Upload Your Fitness Data</h1>
-<p class="text-center text-muted">Choose a category and enter your latest health data.</p>
+<p class="text-center text-muted">Choose a category and enter your latest health data or upload a CSV file.</p>
 
 <!-- Tabs -->
 <ul class="nav nav-tabs mb-4 justify-content-center" id="uploadTabs" role="tablist">
@@ -22,7 +24,7 @@
 <div class="tab-content" id="uploadTabsContent">
   <!-- Exercise Form -->
   <div class="tab-pane fade show active" id="exercise" role="tabpanel">
-    <form method="POST" action="{{ url_for('main.upload') }}" class="p-4 border rounded shadow-sm bg-light">
+    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
       <div class="mb-3">
         <label class="form-label">Workout Type</label>
         <select class="form-select" name="workout_type" required>
@@ -39,12 +41,28 @@
         </select>
       </div>
       <div class="mb-3">
+        <label class="form-label">Intensity</label>
+        <select class="form-select" name="intensity">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+      </div>
+      <div class="mb-3">
         <label class="form-label">Duration (minutes)</label>
         <input type="number" name="duration" class="form-control" min="1" required>
       </div>
       <div class="mb-3">
+        <label class="form-label">Distance (km)</label>
+        <input type="number" step="0.1" name="distance" class="form-control">
+      </div>
+      <div class="mb-3">
         <label class="form-label">Calories Burned</label>
         <input type="number" name="calories" class="form-control" min="0">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Heart Rate</label>
+        <input type="number" name="heart_rate" class="form-control">
       </div>
       <div class="mb-3">
         <label class="form-label">Date</label>
@@ -54,14 +72,17 @@
         <label class="form-label">Notes (optional)</label>
         <textarea name="notes" class="form-control" rows="2"></textarea>
       </div>
+      <div class="mb-3">
+        <label class="form-label">Upload CSV (optional)</label>
+        <input type="file" name="exercise_file" class="form-control">
+      </div>
       <button type="submit" class="btn btn-primary w-100">Save Exercise</button>
     </form>
   </div>
 
-
-<!-- Diet Tab -->
-<div class="tab-pane fade" id="diet" role="tabpanel">
-    <form method="POST" action="{{ url_for('main.upload') }}" class="p-4 border rounded shadow-sm bg-light mt-3">
+  <!-- Diet Tab -->
+  <div class="tab-pane fade" id="diet" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light mt-3">
       <div class="mb-3">
         <label class="form-label">Meal Type</label>
         <select class="form-select" name="meal_type" required>
@@ -81,6 +102,26 @@
         <input type="number" name="diet_calories" class="form-control" min="0" required>
       </div>
       <div class="mb-3">
+        <label class="form-label">Meal Time</label>
+        <input type="time" name="meal_time" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Protein (g)</label>
+        <input type="number" name="protein" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Carbs (g)</label>
+        <input type="number" name="carbs" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fats (g)</label>
+        <input type="number" name="fats" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Water Intake (ml)</label>
+        <input type="number" name="water" class="form-control">
+      </div>
+      <div class="mb-3">
         <label class="form-label">Date</label>
         <input type="date" name="diet_date" class="form-control" required>
       </div>
@@ -88,14 +129,17 @@
         <label class="form-label">Notes (optional)</label>
         <textarea name="diet_notes" class="form-control" rows="2"></textarea>
       </div>
+      <div class="mb-3">
+        <label class="form-label">Upload CSV (optional)</label>
+        <input type="file" name="diet_file" class="form-control">
+      </div>
       <button type="submit" class="btn btn-warning w-100">Save Diet Entry</button>
     </form>
   </div>
 
-  
   <!-- Sleep Tab -->
-<div class="tab-pane fade" id="sleep" role="tabpanel">
-    <form method="POST" action="{{ url_for('main.upload') }}" class="p-4 border rounded shadow-sm bg-light mt-3">
+  <div class="tab-pane fade" id="sleep" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light mt-3">
       <div class="mb-3">
         <label class="form-label">Sleep Start</label>
         <input type="datetime-local" name="sleep_start" class="form-control" required>
@@ -115,11 +159,31 @@
         </select>
       </div>
       <div class="mb-3">
+        <label class="form-label">Wake-ups</label>
+        <input type="number" name="wake_ups" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep Efficiency (%)</label>
+        <input type="number" name="efficiency" class="form-control" min="0" max="100" step="1">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep Type</label>
+        <select class="form-select" name="sleep_type">
+          <option>Nap</option>
+          <option>Night</option>
+          <option>Both</option>
+        </select>
+      </div>
+      <div class="mb-3">
         <label class="form-label">Notes (optional)</label>
         <textarea name="sleep_notes" class="form-control" rows="2"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Upload CSV (optional)</label>
+        <input type="file" name="sleep_file" class="form-control">
       </div>
       <button type="submit" class="btn btn-info w-100">Save Sleep Entry</button>
     </form>
   </div>
-  
+</div>
 {% endblock %}
