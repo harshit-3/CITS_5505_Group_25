@@ -3,6 +3,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from .models import db, User, ExerciseEntry, DietEntry, SleepEntry
 from markupsafe import Markup
 from datetime import datetime
+import io
+import base64
+import matplotlib.pyplot as plt
+from flask import send_file
 
 main = Blueprint("main", __name__)
 
@@ -59,6 +63,7 @@ def login():
         return redirect(url_for("main.dashboard"))
 
     return render_template("login.html")
+
 
 @main.route("/dashboard")
 def dashboard():
@@ -227,12 +232,55 @@ def sleep_records():
     records = SleepEntry.query.filter_by(user_id=session["user_id"]).order_by(SleepEntry.sleep_start.desc()).all()
     return render_template("sleep_records.html", records=records)
 
+
 @main.route("/analysis")
 def analysis():
     if "user_id" not in session:
         flash("Please log in to view analysis.", "warning")
         return redirect(url_for("main.login"))
-    return render_template("analysis.html")
+
+    user_id = session["user_id"]
+    exercise_data = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date).all()
+    sleep_data = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start).all()
+
+    # --- Chart 1: Calories Burned ---
+    exercise_dates = [e.date for e in exercise_data]
+    calories = [e.calories or 0 for e in exercise_data]
+
+    fig1, ax1 = plt.subplots()
+    ax1.plot(exercise_dates, calories, marker='o')
+    ax1.set_title("Calories Burned Over Time")
+    ax1.set_xlabel("Date")
+    ax1.set_ylabel("Calories")
+    fig1.tight_layout()
+
+    buf1 = io.BytesIO()
+    fig1.savefig(buf1, format='png')
+    buf1.seek(0)
+    chart1 = base64.b64encode(buf1.getvalue()).decode('utf-8')
+    plt.close(fig1)
+
+    # --- Chart 2: Sleep Efficiency ---
+    sleep_dates = [s.sleep_start.date() for s in sleep_data]
+    efficiency = [s.efficiency or 0 for s in sleep_data]
+
+    fig2, ax2 = plt.subplots()
+    ax2.plot(sleep_dates, efficiency, color='green', marker='s')
+    ax2.set_title("Sleep Efficiency Over Time")
+    ax2.set_xlabel("Date")
+    ax2.set_ylabel("Efficiency (%)")
+    fig2.tight_layout()
+
+    buf2 = io.BytesIO()
+    fig2.savefig(buf2, format='png')
+    buf2.seek(0)
+    chart2 = base64.b64encode(buf2.getvalue()).decode('utf-8')
+    plt.close(fig2)
+    print("📈 Analysis route triggered")
+
+
+    return render_template("analysis.html", chart1=chart1, chart2=chart2)
+
 
 @main.route("/share")
 def share():
