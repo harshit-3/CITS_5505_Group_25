@@ -2,13 +2,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import db, User, ExerciseEntry, DietEntry, SleepEntry
 from markupsafe import Markup
+from datetime import datetime
 
 main = Blueprint("main", __name__)
 
 @main.route("/")
 def index():
-    return render_template("index.html",logged_in= ("user_id" in session))
-
+    return render_template("index.html", logged_in=("user_id" in session))
 
 @main.route("/register", methods=["GET", "POST"])
 def register():
@@ -25,13 +25,12 @@ def register():
             error = "An account with this email already exists. Try logging in or use 'Forgot Password'."
             return render_template("register.html", error=error)
 
-
         new_user = User(
             first_name=request.form["first_name"],
             last_name=request.form["last_name"],
             email=email,
             password=generate_password_hash(password),
-            birthdate=request.form["birthdate"],
+            birthdate=request.form["birthdate"],  # Could parse to date if model is updated
             gender=request.form["gender"],
             country=request.form["country"]
         )
@@ -40,8 +39,7 @@ def register():
         flash("Registration successful! Please log in.", "success")
         return redirect(url_for("main.login"))
 
-    return render_template("register.html") 
-
+    return render_template("register.html")
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -52,21 +50,15 @@ def login():
         user = User.query.filter_by(email=email).first()
 
         if not user:
-            error = "No account found with this email. Try signing up instead."
-            return render_template("login.html", error=error)
-
+            return render_template("login.html", error="No account found with this email.")
         if not check_password_hash(user.password, password):
-            error = "Incorrect password. Please try again."
-            return render_template("login.html", error=error, email=email)
+            return render_template("login.html", error="Incorrect password.", email=email)
 
-        # Success
         session["user_id"] = user.id
         flash("Login successful!", "success")
         return redirect(url_for("main.dashboard"))
 
     return render_template("login.html")
-
-
 
 @main.route("/dashboard")
 def dashboard():
@@ -74,8 +66,6 @@ def dashboard():
         flash("Please log in to access your dashboard.", "warning")
         return redirect(url_for("main.login"))
     return render_template("dashboard.html")
-
-
 
 @main.route("/upload", methods=["GET", "POST"])
 def upload():
@@ -86,7 +76,6 @@ def upload():
     if request.method == "POST":
         user_id = session["user_id"]
 
-        # 🔍 Unified CSV file handling based on tab category
         if 'csv_file' in request.files and 'category' in request.form:
             file = request.files['csv_file']
             category = request.form['category']
@@ -102,64 +91,64 @@ def upload():
                 flash("Invalid CSV format.", "danger")
                 return redirect(url_for("main.upload"))
 
-            if category == "exercise":
-                for _, row in df.iterrows():
-                    entry = ExerciseEntry(
-                        user_id=user_id,
-                        workout_type=row.get("workout_type"),
-                        intensity=row.get("intensity"),
-                        duration=row.get("duration"),
-                        distance=row.get("distance"),
-                        calories=row.get("calories"),
-                        heart_rate=row.get("heart_rate"),
-                        date=row.get("date"),
-                        notes=row.get("notes", "")
-                    )
-                    db.session.add(entry)
-                db.session.commit()
-                flash("Exercise data uploaded from CSV!", "success")
+            try:
+                if category == "exercise":
+                    for _, row in df.iterrows():
+                        entry = ExerciseEntry(
+                            user_id=user_id,
+                            workout_type=row.get("workout_type"),
+                            intensity=row.get("intensity"),
+                            duration=row.get("duration"),
+                            distance=row.get("distance"),
+                            calories=row.get("calories"),
+                            heart_rate=row.get("heart_rate"),
+                            date=datetime.strptime(row.get("date"), "%Y-%m-%d").date(),
+                            notes=row.get("notes", "")
+                        )
+                        db.session.add(entry)
 
-            elif category == "diet":
-                for _, row in df.iterrows():
-                    entry = DietEntry(
-                        user_id=user_id,
-                        meal_type=row.get("meal_type"),
-                        food_name=row.get("food_name"),
-                        calories=row.get("calories"),
-                        meal_time=row.get("meal_time"),
-                        protein=row.get("protein"),
-                        carbs=row.get("carbs"),
-                        fats=row.get("fats"),
-                        water=row.get("water"),
-                        date=row.get("date"),
-                        notes=row.get("notes", "")
-                    )
-                    db.session.add(entry)
-                db.session.commit()
-                flash("Diet data uploaded from CSV!", "success")
+                elif category == "diet":
+                    for _, row in df.iterrows():
+                        entry = DietEntry(
+                            user_id=user_id,
+                            meal_type=row.get("meal_type"),
+                            food_name=row.get("food_name"),
+                            calories=row.get("calories"),
+                            meal_time=row.get("meal_time"),
+                            protein=row.get("protein"),
+                            carbs=row.get("carbs"),
+                            fats=row.get("fats"),
+                            water=row.get("water"),
+                            date=datetime.strptime(row.get("date"), "%Y-%m-%d").date(),
+                            notes=row.get("notes", "")
+                        )
+                        db.session.add(entry)
 
-            elif category == "sleep":
-                for _, row in df.iterrows():
-                    entry = SleepEntry(
-                        user_id=user_id,
-                        sleep_start=row.get("sleep_start"),
-                        sleep_end=row.get("sleep_end"),
-                        sleep_quality=row.get("sleep_quality"),
-                        wake_ups=row.get("wake_ups"),
-                        efficiency=row.get("efficiency"),
-                        sleep_type=row.get("sleep_type"),
-                        notes=row.get("notes", "")
-                    )
-                    db.session.add(entry)
-                db.session.commit()
-                flash("Sleep data uploaded from CSV!", "success")
+                elif category == "sleep":
+                    for _, row in df.iterrows():
+                        entry = SleepEntry(
+                            user_id=user_id,
+                            sleep_start=datetime.strptime(row.get("sleep_start"), "%Y-%m-%dT%H:%M"),
+                            sleep_end=datetime.strptime(row.get("sleep_end"), "%Y-%m-%dT%H:%M"),
+                            sleep_quality=row.get("sleep_quality"),
+                            wake_ups=row.get("wake_ups"),
+                            efficiency=row.get("efficiency"),
+                            sleep_type=row.get("sleep_type"),
+                            notes=row.get("notes", "")
+                        )
+                        db.session.add(entry)
+                else:
+                    flash("Invalid upload category.", "danger")
+                    return redirect(url_for("main.upload"))
 
-            else:
-                flash("Invalid upload category.", "danger")
+                db.session.commit()
+                flash(f"{category.capitalize()} data uploaded from CSV!", "success")
+            except Exception as e:
+                flash(f"Error processing CSV data: {str(e)}", "danger")
 
             return redirect(url_for("main.upload"))
 
-        # 🧾 Manual Form Input: Exercise
+        # Manual: Exercise
         elif "workout_type" in request.form:
             entry = ExerciseEntry(
                 user_id=user_id,
@@ -169,14 +158,12 @@ def upload():
                 distance=request.form.get("distance"),
                 calories=request.form.get("calories"),
                 heart_rate=request.form.get("heart_rate"),
-                date=request.form["date"],
+                date=datetime.strptime(request.form["date"], "%Y-%m-%d").date(),
                 notes=request.form.get("notes", "") or "None"
             )
             db.session.add(entry)
-            db.session.commit()
-            flash("Exercise entry saved!", "success")
 
-        # 🧾 Manual Form Input: Diet
+        # Manual: Diet
         elif "meal_type" in request.form:
             entry = DietEntry(
                 user_id=user_id,
@@ -188,19 +175,17 @@ def upload():
                 carbs=request.form.get("carbs"),
                 fats=request.form.get("fats"),
                 water=request.form.get("water"),
-                date=request.form["diet_date"],
+                date=datetime.strptime(request.form["diet_date"], "%Y-%m-%d").date(),
                 notes=request.form.get("diet_notes", "") or "None"
             )
             db.session.add(entry)
-            db.session.commit()
-            flash("Diet entry saved!", "success")
 
-        # 🧾 Manual Form Input: Sleep
+        # Manual: Sleep
         elif "sleep_start" in request.form:
             entry = SleepEntry(
                 user_id=user_id,
-                sleep_start=request.form["sleep_start"],
-                sleep_end=request.form["sleep_end"],
+                sleep_start=datetime.strptime(request.form["sleep_start"], "%Y-%m-%dT%H:%M"),
+                sleep_end=datetime.strptime(request.form["sleep_end"], "%Y-%m-%dT%H:%M"),
                 sleep_quality=request.form["sleep_quality"],
                 wake_ups=request.form.get("wake_ups"),
                 efficiency=request.form.get("efficiency"),
@@ -208,14 +193,12 @@ def upload():
                 notes=request.form.get("sleep_notes", "") or "None"
             )
             db.session.add(entry)
-            db.session.commit()
-            flash("Sleep entry saved!", "success")
 
+        db.session.commit()
+        flash("Data saved successfully!", "success")
         return redirect(url_for("main.upload"))
 
     return render_template("upload.html")
-
-
 
 @main.route("/logout")
 def logout():
@@ -223,34 +206,26 @@ def logout():
     flash("You have been logged out.", "info")
     return redirect(url_for("main.login"))
 
-
 @main.route("/records/exercise")
 def exercise_records():
     if "user_id" not in session:
         return redirect(url_for("main.login"))
-
-    user_id = session["user_id"]
-    records = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date.desc()).all()
+    records = ExerciseEntry.query.filter_by(user_id=session["user_id"]).order_by(ExerciseEntry.date.desc()).all()
     return render_template("exercise_records.html", records=records)
 
 @main.route("/records/diet")
 def diet_records():
     if "user_id" not in session:
         return redirect(url_for("main.login"))
-
-    user_id = session["user_id"]
-    records = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date.desc()).all()
+    records = DietEntry.query.filter_by(user_id=session["user_id"]).order_by(DietEntry.date.desc()).all()
     return render_template("diet_records.html", records=records)
 
 @main.route("/records/sleep")
 def sleep_records():
     if "user_id" not in session:
         return redirect(url_for("main.login"))
-
-    user_id = session["user_id"]
-    records = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start.desc()).all()
+    records = SleepEntry.query.filter_by(user_id=session["user_id"]).order_by(SleepEntry.sleep_start.desc()).all()
     return render_template("sleep_records.html", records=records)
-
 
 @main.route("/analysis")
 def analysis():

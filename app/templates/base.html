@@ -20,6 +20,12 @@
               <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('main.upload') }}">Upload</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('main.analysis') }}">Analysis</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="{{ url_for('main.exercise_records') }}">Exercise</a>
             </li>
             <li class="nav-item">
@@ -28,9 +34,7 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('main.sleep_records') }}">Sleep</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('main.upload') }}">Upload</a>
-            </li>
+            
             <li class="nav-item">
               <a class="nav-link text-danger fw-bold" href="{{ url_for('main.logout') }}">Logout</a>
             </li>
