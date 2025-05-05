@@ -6,12 +6,21 @@
     <p class="text-muted text-center">Visualize trends and insights from your fitness data here.</p>
 </div>
 
-<div class="text-center mt-4">
-    <img src="{{ url_for('static', filename='images/fitness_dummy_analysis.png') }}" class="img-fluid" alt="Fitness Graph">
+{% if chart1 %}
+<h3 class="text-center mt-4">Calories Burned</h3>
+<div class="text-center">
+    <img src="data:image/png;base64,{{ chart1 | safe }}" class="img-fluid" alt="Calories Chart">
 </div>
-<div class="text-center mt-4">
-    <img src="{{ url_for('static', filename='images/sleep_dummy_analysis.png') }}" class="img-fluid" alt="Sleep Graph">
+{% else %}
+<p class="text-center text-muted">No exercise data available.</p>
+{% endif %}
+
+{% if chart2 %}
+<h3 class="text-center mt-4">Sleep Efficiency</h3>
+<div class="text-center">
+    <img src="data:image/png;base64,{{ chart2 | safe }}" class="img-fluid" alt="Sleep Efficiency Chart">
 </div>
-
-
+{% else %}
+<p class="text-center text-muted">No sleep data available.</p>
+{% endif %}
 {% endblock %}
