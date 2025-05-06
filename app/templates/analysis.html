@@ -1,26 +1,113 @@
 {% extends 'base.html' %}
 {% block title %}Analysis{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analysis.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const diet_protein = {{ diet_protein | safe }};
+  const diet_carbs = {{ diet_carbs | safe }};
+  const diet_fats = {{ diet_fats | safe }};
+
+  const chartData = {
+    exercise_dates: {{ exercise_dates | default("[]") | safe }},
+    exercise_durations: {{ exercise_durations | default("[]") | safe }},
+    exercise_calories: {{ exercise_calories | default("[]") | safe }},
+    exercise_heart_rate: {{ exercise_heart_rate | default("[]") | safe }},
+    exercise_types: {{ exercise_types | default("[]") | safe }},
+    exercise_intensity_labels: {{ exercise_intensity_labels | default("[]") | safe }},
+    exercise_intensity_counts: {{ exercise_intensity_counts | default("[]") | safe }},
+    exercise_frequency_labels: {{ exercise_frequency_labels | default("[]") | safe }},
+    exercise_frequency_values: {{ exercise_frequency_values | default("[]") | safe }},
+    diet_dates: {{ diet_dates | default("[]") | safe }},
+    diet_calories: {{ diet_calories | default("[]") | safe }},
+    diet_water: {{ diet_water | default("[]") | safe }},
+    diet_protein: diet_protein,
+    diet_carbs: diet_carbs,
+    diet_fats: diet_fats,
+    meal_labels: {{ meal_labels | default("[]") | safe }},
+    meal_values: {{ meal_values | default("[]") | safe }},
+    sleep_dates: {{ sleep_dates | default("[]") | safe }},
+    sleep_duration: {{ sleep_duration | default("[]") | safe }},
+    sleep_efficiency: {{ sleep_efficiency | default("[]") | safe }},
+    sleep_stage_labels: {{ sleep_stage_labels | default("[]") | safe }},
+    sleep_stage_counts: {{ sleep_stage_counts | default("[]") | safe }},
+    sleep_wake_ups: {{ sleep_wake_ups | default("[]") | safe }},
+    sleep_wake_ups_dates: {{ sleep_wake_ups_dates | default("[]") | safe }}
+  };
+</script>
+<script src="{{ url_for('static', filename='js/analysis.js') }}" defer></script>
+
 <div class="container mt-4">
-    <h2 class="text-center">📊 Fitness Data Analysis</h2>
-    <p class="text-muted text-center">Visualize trends and insights from your fitness data here.</p>
-</div>
+  <h2 class="text-center">📊 Fitness Data Analysis</h2>
+  <p class="text-muted text-center">Visualize trends and insights from your fitness data here.</p>
 
-{% if chart1 %}
-<h3 class="text-center mt-4">Calories Burned</h3>
-<div class="text-center">
-    <img src="data:image/png;base64,{{ chart1 | safe }}" class="img-fluid" alt="Calories Chart">
-</div>
-{% else %}
-<p class="text-center text-muted">No exercise data available.</p>
-{% endif %}
+  <!-- Exercise Section -->
+  <div class="row mt-5 mb-3">
+    <div class="col-12">
+      <h3>Exercise</h3><hr>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Daily Exercise Duration</h5>
+      <canvas id="exerciseChart1" class="chart-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Exercise Intensity Levels</h5>
+      <canvas id="exerciseChart2" class="chart-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Calories Burned per Session</h5>
+      <canvas id="exerciseChart3" class="chart-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Weekly Exercise Frequency</h5>
+      <canvas id="exerciseChart4" class="chart-canvas"></canvas>
+    </div>
+  </div>
 
-{% if chart2 %}
-<h3 class="text-center mt-4">Sleep Efficiency</h3>
-<div class="text-center">
-    <img src="data:image/png;base64,{{ chart2 | safe }}" class="img-fluid" alt="Sleep Efficiency Chart">
+  <!-- Diet Section -->
+  <div class="row mt-2 mb-2">
+    <div class="col-12">
+      <h3>Diet</h3><hr>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Daily Caloric Intake</h5>
+      <canvas id="dietChart1" class="chart-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Macronutrient Breakdown</h5>
+      <canvas id="dietChart2" class="chart-canvas doughnut-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Water Consumption</h5>
+      <canvas id="dietChart3" class="chart-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Weekly Meal Frequency</h5>
+      <canvas id="dietChart4" class="chart-canvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Sleep Section -->
+  <div class="row mt-2 mb-2">
+    <div class="col-12">
+      <h3>Sleep</h3><hr>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Daily Sleep Duration</h5>
+      <canvas id="sleepChart1" class="chart-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Sleep Quality Scores</h5>
+      <canvas id="sleepChart2" class="chart-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Sleep Type Distribution</h5>
+      <canvas id="sleepChart3" class="chart-canvas doughnut-canvas"></canvas>
+    </div>
+    <div class="col-md-3 mb-4">
+      <h5>Sleep Wake-ups</h5>
+      <canvas id="sleepChart4" class="chart-canvas"></canvas>
+    </div>
+  </div>
 </div>
-{% else %}
-<p class="text-center text-muted">No sleep data available.</p>
-{% endif %}
 {% endblock %}

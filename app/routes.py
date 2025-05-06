@@ -7,6 +7,9 @@ import io
 import base64
 import matplotlib.pyplot as plt
 from flask import send_file
+from collections import Counter
+from collections import defaultdict
+
 
 main = Blueprint("main", __name__)
 
@@ -240,46 +243,141 @@ def analysis():
         return redirect(url_for("main.login"))
 
     user_id = session["user_id"]
+
+    #  get all the data required
     exercise_data = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date).all()
+    # print("exercise_data=========================")
+    # print(exercise_data)
+    # print("exercise_data=========================")
+    diet_data = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date).all()
+    # print("diet_data+++++++++++++++++++++++++++")
+    # print(diet_data)
+    # print("diet_data+++++++++++++++++++++++++++")
     sleep_data = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start).all()
+    # print("sleep_data----------------------------")
+    # print(sleep_data)
+    # print("sleep_data----------------------------")
 
-    # --- Chart 1: Calories Burned ---
-    exercise_dates = [e.date for e in exercise_data]
-    calories = [e.calories or 0 for e in exercise_data]
+    #  Extract fields (required for each image)
+    exercise_types = [e.workout_type for e in exercise_data]
+    intensity_counter = Counter(exercise_types)
+    exercise_intensity_labels = list(intensity_counter.keys())
+    exercise_intensity_counts = list(intensity_counter.values())
+    # Exercise frequency by week
+    exercise_frequency = defaultdict(int)
+    for e in exercise_data:
+        week_str = e.date.strftime("%Y-Week%U")
+        exercise_frequency[week_str] += 1
+    exercise_frequency_labels = list(exercise_frequency.keys())
+    exercise_frequency_values = list(exercise_frequency.values())
 
-    fig1, ax1 = plt.subplots()
-    ax1.plot(exercise_dates, calories, marker='o')
-    ax1.set_title("Calories Burned Over Time")
-    ax1.set_xlabel("Date")
-    ax1.set_ylabel("Calories")
-    fig1.tight_layout()
+    # Aggregate exercise data by date
+    exercise_duration_by_date = defaultdict(int)
+    exercise_calories_by_date = defaultdict(int)
+    exercise_heart_rate_by_date = defaultdict(list)
 
-    buf1 = io.BytesIO()
-    fig1.savefig(buf1, format='png')
-    buf1.seek(0)
-    chart1 = base64.b64encode(buf1.getvalue()).decode('utf-8')
-    plt.close(fig1)
+    for e in exercise_data:
+        date_str = e.date.strftime("%Y-%m-%d")
+        exercise_duration_by_date[date_str] += e.duration or 0
+        exercise_calories_by_date[date_str] += e.calories or 0
+        if e.heart_rate:
+            exercise_heart_rate_by_date[date_str].append(e.heart_rate)
 
-    # --- Chart 2: Sleep Efficiency ---
-    sleep_dates = [s.sleep_start.date() for s in sleep_data]
-    efficiency = [s.efficiency or 0 for s in sleep_data]
+    exercise_dates = sorted(exercise_duration_by_date.keys())
+    exercise_durations = [exercise_duration_by_date[d] for d in exercise_dates]
+    exercise_calories = [exercise_calories_by_date[d] for d in exercise_dates]
+    exercise_heart_rate = [
+        round(sum(exercise_heart_rate_by_date[d]) / len(exercise_heart_rate_by_date[d]), 1)
+        if exercise_heart_rate_by_date[d] else 0
+        for d in exercise_dates
+    ]
 
-    fig2, ax2 = plt.subplots()
-    ax2.plot(sleep_dates, efficiency, color='green', marker='s')
-    ax2.set_title("Sleep Efficiency Over Time")
-    ax2.set_xlabel("Date")
-    ax2.set_ylabel("Efficiency (%)")
-    fig2.tight_layout()
+    # Aggregate diet data by date
+    diet_calories_by_date = defaultdict(int)
+    diet_water_by_date = defaultdict(int)
 
-    buf2 = io.BytesIO()
-    fig2.savefig(buf2, format='png')
-    buf2.seek(0)
-    chart2 = base64.b64encode(buf2.getvalue()).decode('utf-8')
-    plt.close(fig2)
-    print("📈 Analysis route triggered")
+    for d in diet_data:
+        date_str = d.date.strftime("%Y-%m-%d")
+        diet_calories_by_date[date_str] += d.calories or 0
+        diet_water_by_date[date_str] += d.water or 0
+
+    diet_dates = sorted(diet_calories_by_date.keys())
+    diet_calories = [diet_calories_by_date[d] for d in diet_dates]
+    diet_water = [diet_water_by_date[d] for d in diet_dates]
+
+    diet_protein = [d.protein or 0 for d in diet_data]
+    diet_carbs = [d.carbs or 0 for d in diet_data]
+    diet_fats = [d.fats or 0 for d in diet_data]
+    diet_meal_type = [d.meal_type for d in diet_data]
+    meal_frequency = defaultdict(int)
+    for d in diet_data:
+        week_str = d.date.strftime("%Y-Week%U")
+        meal_frequency[week_str] += 1
+    meal_labels = list(meal_frequency.keys())
+    meal_values = list(meal_frequency.values())
+
+    # Aggregate sleep duration by date
+    sleep_duration_by_date = defaultdict(float)
+
+    for s in sleep_data:
+        date_str = s.sleep_start.strftime("%Y-%m-%d")
+        duration_hours = (s.sleep_end - s.sleep_start).seconds / 3600
+        sleep_duration_by_date[date_str] += duration_hours
+
+    sleep_dates = sorted(sleep_duration_by_date.keys())
+    sleep_duration = [sleep_duration_by_date[d] for d in sleep_dates]
+
+    sleep_efficiency = [s.efficiency or 0 for s in sleep_data]
+
+    # Group and sum wake-up counts per date
+    sleep_wake_ups_by_date = defaultdict(int)
+    for s in sleep_data:
+        date_str = s.sleep_start.strftime("%Y-%m-%d")
+        sleep_wake_ups_by_date[date_str] += s.wake_ups or 0
+
+    sleep_wake_ups_dates = sorted(sleep_wake_ups_by_date.keys())
+    sleep_wake_ups = [sleep_wake_ups_by_date[d] for d in sleep_wake_ups_dates]
+
+    sleep_type = [s.sleep_type for s in sleep_data]
+    # Compute count of each sleep type
+    sleep_stage_counter = Counter(sleep_type)
+    sleep_stage_labels = list(sleep_stage_counter.keys())
+    sleep_stage_counts = list(sleep_stage_counter.values())
 
 
-    return render_template("analysis.html", chart1=chart1, chart2=chart2)
+
+    #  Pass to the template
+    return render_template("analysis.html",
+        exercise_dates=exercise_dates,
+        exercise_durations=exercise_durations,
+        exercise_calories=exercise_calories,
+        exercise_heart_rate=exercise_heart_rate,
+        exercise_types=exercise_types,
+        exercise_intensity_labels=exercise_intensity_labels,
+        exercise_intensity_counts=exercise_intensity_counts,
+        exercise_frequency_labels=exercise_frequency_labels,
+        exercise_frequency_values=exercise_frequency_values,
+
+
+        diet_dates=diet_dates,
+        diet_calories=diet_calories,
+        diet_water=diet_water,
+        diet_protein=diet_protein,
+        diet_carbs=diet_carbs,
+        diet_fats=diet_fats,
+        diet_meal_type=diet_meal_type,
+        meal_labels=meal_labels,
+        meal_values=meal_values,
+
+        sleep_dates=sleep_dates,
+        sleep_efficiency=sleep_efficiency,
+        sleep_wake_ups=sleep_wake_ups,
+        sleep_wake_ups_dates=sleep_wake_ups_dates,
+        sleep_type=sleep_type,
+        sleep_duration=sleep_duration,
+        sleep_stage_labels=sleep_stage_labels,
+        sleep_stage_counts=sleep_stage_counts,
+    )
 
 
 @main.route("/share")
