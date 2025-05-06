@@ -1,0 +1,11 @@
+workout_type,intensity,duration,distance,calories,heart_rate,date,notes
+Running,High,30,5.0,300,150,2024-04-20,Felt great during the run
+Yoga,Low,60,,150,90,2024-04-21,Relaxing yoga session
+Biking,Medium,45,12.5,350,135,2024-04-22,Road cycling
+Swimming,High,40,1.2,400,140,2024-04-23,Pool training
+Treadmill,Medium,50,6.2,380,130,2024-04-24,Indoor cardio
+Hiking,High,90,8.0,600,145,2024-04-25,Hill hike
+Weightlifting,High,60,,450,125,2024-04-26,Strength training
+Pilates,Low,45,,200,95,2024-04-27,Core workout
+Rowing,Medium,30,4.0,320,138,2024-04-28,Rowing machine
+Zumba,Medium,60,,420,142,2024-04-29,Dance workout
