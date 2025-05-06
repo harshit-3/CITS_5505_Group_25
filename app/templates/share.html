@@ -1,8 +1,169 @@
 {% extends 'base.html' %}
 {% block title %}Share Progress{% endblock %}
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analysis.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/share.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script>
+    const diet_protein = {{ diet_protein | safe }};
+    const diet_carbs = {{ diet_carbs | safe }};
+    const diet_fats = {{ diet_fats | safe }};
+
+    const chartData = {
+        exercise_dates: {{ exercise_dates | default("[]") | safe }},
+    exercise_durations: {{ exercise_durations | default("[]") | safe }},
+    exercise_calories: {{ exercise_calories | default("[]") | safe }},
+    exercise_heart_rate: {{ exercise_heart_rate | default("[]") | safe }},
+    exercise_types: {{ exercise_types | default("[]") | safe }},
+    exercise_intensity_labels: {{ exercise_intensity_labels | default("[]") | safe }},
+    exercise_intensity_counts: {{ exercise_intensity_counts | default("[]") | safe }},
+    exercise_frequency_labels: {{ exercise_frequency_labels | default("[]") | safe }},
+    exercise_frequency_values: {{ exercise_frequency_values | default("[]") | safe }},
+    diet_dates: {{ diet_dates | default("[]") | safe }},
+    diet_calories: {{ diet_calories | default("[]") | safe }},
+    diet_water: {{ diet_water | default("[]") | safe }},
+    diet_protein: diet_protein,
+        diet_carbs: diet_carbs,
+        diet_fats: diet_fats,
+        meal_labels: {{ meal_labels | default("[]") | safe }},
+    meal_values: {{ meal_values | default("[]") | safe }},
+    sleep_dates: {{ sleep_dates | default("[]") | safe }},
+    sleep_duration: {{ sleep_duration | default("[]") | safe }},
+    sleep_efficiency: {{ sleep_efficiency | default("[]") | safe }},
+    sleep_stage_labels: {{ sleep_stage_labels | default("[]") | safe }},
+    sleep_stage_counts: {{ sleep_stage_counts | default("[]") | safe }},
+    sleep_wake_ups: {{ sleep_wake_ups | default("[]") | safe }},
+    sleep_wake_ups_dates: {{ sleep_wake_ups_dates | default("[]") | safe }}
+    };
+</script>
+<script src="{{ url_for('static', filename='js/share.js') }}" defer></script>
+
 <div class="container mt-4">
     <h2 class="text-center">🔗 Share Your Progress</h2>
     <p class="text-muted text-center">Generate and share personalized reports of your fitness journey.</p>
+    <div class="alert alert-info text-center">
+        {{ summary }}
+    </div>
+
+    <!-- Exercise Section -->
+    <div class="row mt-5 mb-3">
+        <div class="col-12">
+            <h3>Exercise</h3><hr>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Daily Exercise Duration</h5>
+            <canvas id="exerciseChart1" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('exerciseChart1')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Exercise Intensity Levels</h5>
+            <canvas id="exerciseChart2" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('exerciseChart2')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Calories Burned per Session</h5>
+            <canvas id="exerciseChart3" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('exerciseChart3')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Weekly Exercise Frequency</h5>
+            <canvas id="exerciseChart4" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('exerciseChart4')">Download</button>
+        </div>
+    </div>
+
+    <!-- Diet Section -->
+    <div class="row mt-2 mb-2">
+        <div class="col-12">
+            <h3>Diet</h3><hr>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Daily Caloric Intake</h5>
+            <canvas id="dietChart1" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('dietChart1')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Macronutrient Breakdown</h5>
+            <canvas id="dietChart2" class="chart-canvas doughnut-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('dietChart2')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Water Consumption</h5>
+            <canvas id="dietChart3" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('dietChart3')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Weekly Meal Frequency</h5>
+            <canvas id="dietChart4" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('dietChart4')">Download</button>
+        </div>
+    </div>
+
+    <!-- Sleep Section -->
+    <div class="row mt-2 mb-2">
+        <div class="col-12">
+            <h3>Sleep</h3><hr>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Daily Sleep Duration</h5>
+            <canvas id="sleepChart1" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('sleepChart1')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Sleep Quality Scores</h5>
+            <canvas id="sleepChart2" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('sleepChart2')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Sleep Type Distribution</h5>
+            <canvas id="sleepChart3" class="chart-canvas doughnut-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('sleepChart3')">Download</button>
+        </div>
+        <div class="col-md-3 mb-4 text-center">
+            <h5>Sleep Wake-ups</h5>
+            <canvas id="sleepChart4" class="chart-canvas"></canvas>
+            <button class="btn btn-primary mt-2 download-btn" onclick="downloadChart('sleepChart4')">Download</button>
+        </div>
+    </div>
+
+    <!-- Social Media Share Icons -->
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <div class="social-icons">
+                <a href="#" id="share-x" target="_blank" title="Share on X"><i class="fab fa-x-twitter"></i></a>
+                <a href="#" id="share-discord" target="_blank" title="Share on Discord"><i class="fab fa-discord"></i></a>
+                <a href="#" id="share-tiktok" target="_blank" title="Share on TikTok"><i class="fab fa-tiktok"></i></a>
+                <a href="#" id="share-instagram" target="_blank" title="Share on Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" id="share-youtube" target="_blank" title="Share on YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="#" id="share-linkedin" target="_blank" title="Share on LinkedIn"><i class="fab fa-linkedin"></i></a>
+                <a href="#" id="share-github" target="_blank" title="Share on GitHub"><i class="fab fa-github"></i></a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+    // Get current page URL
+    const currentUrl = encodeURIComponent(window.location.href);
+
+    // Share URLs for each platform
+    const shareUrls = {
+        'share-x': `https://x.com/intent/tweet?url=${currentUrl}&text=Check%20out%20my%20progress!`,
+        'share-discord': `https://discord.com/channels/@me`,  // Opens Discord
+        'share-tiktok': `https://www.tiktok.com/upload?referrer=${currentUrl}`,  // Opens TikTok upload
+        'share-instagram': `https://www.instagram.com/`,  // Opens Instagram
+        'share-youtube': `https://www.youtube.com/`,  // Opens YouTube
+        'share-linkedin': `https://www.linkedin.com/sharing/share-offsite/?url=${currentUrl}`,
+        'share-github': `https://github.com/`  // Opens GitHub
+    };
+
+    // Set href for each share link
+    for (const [id, url] of Object.entries(shareUrls)) {
+        const link = document.getElementById(id);
+        if (link) {
+            link.href = url;
+        }
+    }
+</script>
 {% endblock %}
