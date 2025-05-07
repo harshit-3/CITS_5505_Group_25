@@ -375,6 +375,74 @@ def analysis():
                            sleep_stage_counts=sleep_stage_counts,
                            )
 
+# Delete Record of Exercise
+@main.route("/records/exercise/delete/<int:entry_id>", methods=["POST"])
+def delete_exercise(entry_id):
+    if "user_id" not in session:
+        flash("Please log in to delete records.", "warning")
+        return redirect(url_for("main.login"))
+
+    entry = ExerciseEntry.query.get_or_404(entry_id)
+    if entry.user_id != session["user_id"]:
+        flash("You can only delete your own records.", "danger")
+        return redirect(url_for("main.exercise_records"))
+
+    try:
+        db.session.delete(entry)
+        db.session.commit()
+        flash("Exercise record deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Failed to delete exercise record: {str(e)}", "danger")
+
+    return redirect(url_for("main.exercise_records"))
+
+
+# Delete Record of Diet
+@main.route("/records/diet/delete/<int:entry_id>", methods=["POST"])
+def delete_diet(entry_id):
+    if "user_id" not in session:
+        flash("Please log in to delete records.", "warning")
+        return redirect(url_for("main.login"))
+
+    entry = DietEntry.query.get_or_404(entry_id)
+    if entry.user_id != session["user_id"]:
+        flash("You can only delete your own records.", "danger")
+        return redirect(url_for("main.diet_records"))
+
+    try:
+        db.session.delete(entry)
+        db.session.commit()
+        flash("Diet record deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Failed to delete diet record: {str(e)}", "danger")
+
+    return redirect(url_for("main.diet_records"))
+
+
+# Delete Record of Sleep
+@main.route("/records/sleep/delete/<int:entry_id>", methods=["POST"])
+def delete_sleep(entry_id):
+    if "user_id" not in session:
+        flash("Please log in to delete records.", "warning")
+        return redirect(url_for("main.login"))
+
+    entry = SleepEntry.query.get_or_404(entry_id)
+    if entry.user_id != session["user_id"]:
+        flash("You can only delete your own records.", "danger")
+        return redirect(url_for("main.sleep_records"))
+
+    try:
+        db.session.delete(entry)
+        db.session.commit()
+        flash("Sleep record deleted successfully!", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Failed to delete sleep record: {str(e)}", "danger")
+
+    return redirect(url_for("main.sleep_records"))
+
 @main.route("/share")
 def share():
     if "user_id" not in session:

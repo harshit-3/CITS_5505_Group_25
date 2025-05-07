@@ -2,35 +2,61 @@
 {% block title %}Sleep Records{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Your Sleep Records</h2>
-<div class="table-responsive"></div>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Sleep Start</th>
-        <th>Sleep End</th>
-        <th>Quality</th>
-        <th>Notes</th>
-        <th>Wake-ups</th>
-        <th>Efficiency (%)</th>
-        <th>Sleep Type</th>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Sleep Records</h1>
+    <!-- Display flash messages with Bootstrap alerts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
 
-      </tr>
-    </thead>
-    <tbody>
-      {% for entry in records %}
-      <tr>
-        <td>{{ entry.sleep_start }}</td>
-        <td>{{ entry.sleep_end }}</td>
-        <td>{{ entry.sleep_quality }}</td>
-        <td>{{ entry.notes }}</td>
-        <td>{{ entry.wake_ups }}</td>
-        <td>{{ entry.efficiency }}</td>
-        <td>{{ entry.sleep_type }}</td>
-
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    {% if records %}
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Sleep Start</th>
+                        <th>Sleep End</th>
+                        <th>Sleep Quality</th>
+                        <th>Wake-ups</th>
+                        <th>Efficiency (%)</th>
+                        <th>Sleep Type</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in records %}
+                    <tr>
+                        <td>{{ entry.sleep_start }}</td>
+                        <td>{{ entry.sleep_end }}</td>
+                        <td>{{ entry.sleep_quality }}</td>
+                        <td>{{ entry.wake_ups }}</td>
+                        <td>{{ entry.efficiency }}</td>
+                        <td>{{ entry.sleep_type }}</td>
+                        <td>{{ entry.notes }}</td>
+                        <td>
+                            <!-- Delete button with confirmation -->
+                            <form action="{{ url_for('main.delete_sleep', entry_id=entry.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-center">No sleep records found.</p>
+    {% endif %}
+    <div class="text-center mt-4">
+        <a href="{{ url_for('main.upload') }}" class="btn btn-primary">Upload New Data</a>
+    </div>
 </div>
 {% endblock %}
