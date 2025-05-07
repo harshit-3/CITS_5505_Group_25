@@ -83,21 +83,20 @@ def upload():
     if request.method == "POST":
         user_id = session["user_id"]
 
-        # CSV upload
         if 'csv_file' in request.files and 'category' in request.form:
             file = request.files['csv_file']
             category = request.form['category']
 
             if not file or file.filename == '':
-                flash("No file selected.", "danger")
-                return redirect(url_for("main.dashboard"))
+                flash("No file selected.", "warning")
+                return redirect(url_for("main.upload"))
 
             import pandas as pd
             try:
                 df = pd.read_csv(file)
             except Exception:
-                flash(f"Invalid CSV format: {str(e)}", "danger")
-                return redirect(url_for("main.dashboard"))
+                flash("Invalid CSV format.", "danger")
+                return redirect(url_for("main.upload"))
 
             try:
                 if category == "exercise":
@@ -147,84 +146,61 @@ def upload():
                         db.session.add(entry)
                 else:
                     flash("Invalid upload category.", "danger")
-                    return redirect(url_for("main.dashboard"))
+                    return redirect(url_for("main.upload"))
 
                 db.session.commit()
                 flash(f"{category.capitalize()} data uploaded from CSV!", "success")
             except Exception as e:
                 flash(f"Error processing CSV data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
 
-        # Exercise Form
+            return redirect(url_for("main.upload"))
+
         elif "workout_type" in request.form:
-            try:
-                entry = ExerciseEntry(
-                    user_id=user_id,
-                    workout_type=request.form["workout_type"],
-                    intensity=request.form.get("intensity"),
-                    duration=request.form.get("duration"),
-                    distance=request.form.get("distance"),
-                    calories=request.form.get("calories"),
-                    heart_rate=request.form.get("heart_rate"),
-                    date=datetime.strptime(request.form["date"], "%Y-%m-%d").date(),
-                    notes=request.form.get("notes", "") or "None"
-                )
-                db.session.add(entry)
-                db.session.commit()
-                flash("Exercise data saved successfully!", "success")
-            except Exception as e:
-                db.session.rollback()
-                flash(f"Failed to save exercise data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
+            entry = ExerciseEntry(
+                user_id=user_id,
+                workout_type=request.form["workout_type"],
+                intensity=request.form.get("intensity"),
+                duration=request.form.get("duration"),
+                distance=request.form.get("distance"),
+                calories=request.form.get("calories"),
+                heart_rate=request.form.get("heart_rate"),
+                date=datetime.strptime(request.form["date"], "%Y-%m-%d").date(),
+                notes=request.form.get("notes", "") or "None"
+            )
+            db.session.add(entry)
 
-        # Diet Form
         elif "meal_type" in request.form:
-            try:
-                entry = DietEntry(
-                    user_id=user_id,
-                    meal_type=request.form["meal_type"],
-                    food_name=request.form["food_name"],
-                    calories=request.form["diet_calories"],
-                    meal_time=request.form.get("meal_time"),
-                    protein=request.form.get("protein"),
-                    carbs=request.form.get("carbs"),
-                    fats=request.form.get("fats"),
-                    water=request.form.get("water"),
-                    date=datetime.strptime(request.form["diet_date"], "%Y-%m-%d").date(),
-                    notes=request.form.get("diet_notes", "") or "None"
-                )
-                db.session.add(entry)
-                db.session.commit()
-                flash("Diet data saved successfully!", "success")
-            except Exception as e:
-                db.session.rollback()
-                flash(f"Failed to save diet data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
+            entry = DietEntry(
+                user_id=user_id,
+                meal_type=request.form["meal_type"],
+                food_name=request.form["food_name"],
+                calories=request.form["diet_calories"],
+                meal_time=request.form.get("meal_time"),
+                protein=request.form.get("protein"),
+                carbs=request.form.get("carbs"),
+                fats=request.form.get("fats"),
+                water=request.form.get("water"),
+                date=datetime.strptime(request.form["diet_date"], "%Y-%m-%d").date(),
+                notes=request.form.get("diet_notes", "") or "None"
+            )
+            db.session.add(entry)
 
-        # Sleep Form
         elif "sleep_start" in request.form:
-            try:
-                entry = SleepEntry(
-                    user_id=user_id,
-                    sleep_start=datetime.strptime(request.form["sleep_start"], "%Y-%m-%dT%H:%M"),
-                    sleep_end=datetime.strptime(request.form["sleep_end"], "%Y-%m-%dT%H:%M"),
-                    sleep_quality=request.form["sleep_quality"],
-                    wake_ups=request.form.get("wake_ups"),
-                    efficiency=request.form.get("efficiency"),
-                    sleep_type=request.form.get("sleep_type"),
-                    notes=request.form.get("sleep_notes", "") or "None"
-                )
-                db.session.add(entry)
-                db.session.commit()
-                flash("Sleep data saved successfully!", "success")
-            except Exception as e:
-                db.session.rollback()
-                flash(f"Failed to save sleep data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
-        else:
-            # Fallback for invalid or unhandled form submissions
-            flash("Invalid form submission. Please check your input.", "danger")
-            return redirect(url_for("main.dashboard"))
+            entry = SleepEntry(
+                user_id=user_id,
+                sleep_start=datetime.strptime(request.form["sleep_start"], "%Y-%m-%dT%H:%M"),
+                sleep_end=datetime.strptime(request.form["sleep_end"], "%Y-%m-%dT%H:%M"),
+                sleep_quality=request.form["sleep_quality"],
+                wake_ups=request.form.get("wake_ups"),
+                efficiency=request.form.get("efficiency"),
+                sleep_type=request.form.get("sleep_type"),
+                notes=request.form.get("sleep_notes", "") or "None"
+            )
+            db.session.add(entry)
+
+        db.session.commit()
+        flash("Data saved successfully!", "success")
+        return redirect(url_for("main.upload"))
 
     return render_template("upload.html")
 
@@ -374,74 +350,6 @@ def analysis():
                            sleep_stage_labels=sleep_stage_labels,
                            sleep_stage_counts=sleep_stage_counts,
                            )
-
-# Delete Record of Exercise
-@main.route("/records/exercise/delete/<int:entry_id>", methods=["POST"])
-def delete_exercise(entry_id):
-    if "user_id" not in session:
-        flash("Please log in to delete records.", "warning")
-        return redirect(url_for("main.login"))
-
-    entry = ExerciseEntry.query.get_or_404(entry_id)
-    if entry.user_id != session["user_id"]:
-        flash("You can only delete your own records.", "danger")
-        return redirect(url_for("main.exercise_records"))
-
-    try:
-        db.session.delete(entry)
-        db.session.commit()
-        flash("Exercise record deleted successfully!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Failed to delete exercise record: {str(e)}", "danger")
-
-    return redirect(url_for("main.exercise_records"))
-
-
-# Delete Record of Diet
-@main.route("/records/diet/delete/<int:entry_id>", methods=["POST"])
-def delete_diet(entry_id):
-    if "user_id" not in session:
-        flash("Please log in to delete records.", "warning")
-        return redirect(url_for("main.login"))
-
-    entry = DietEntry.query.get_or_404(entry_id)
-    if entry.user_id != session["user_id"]:
-        flash("You can only delete your own records.", "danger")
-        return redirect(url_for("main.diet_records"))
-
-    try:
-        db.session.delete(entry)
-        db.session.commit()
-        flash("Diet record deleted successfully!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Failed to delete diet record: {str(e)}", "danger")
-
-    return redirect(url_for("main.diet_records"))
-
-
-# Delete Record of Sleep
-@main.route("/records/sleep/delete/<int:entry_id>", methods=["POST"])
-def delete_sleep(entry_id):
-    if "user_id" not in session:
-        flash("Please log in to delete records.", "warning")
-        return redirect(url_for("main.login"))
-
-    entry = SleepEntry.query.get_or_404(entry_id)
-    if entry.user_id != session["user_id"]:
-        flash("You can only delete your own records.", "danger")
-        return redirect(url_for("main.sleep_records"))
-
-    try:
-        db.session.delete(entry)
-        db.session.commit()
-        flash("Sleep record deleted successfully!", "success")
-    except Exception as e:
-        db.session.rollback()
-        flash(f"Failed to delete sleep record: {str(e)}", "danger")
-
-    return redirect(url_for("main.sleep_records"))
 
 @main.route("/share")
 def share():

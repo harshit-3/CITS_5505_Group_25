@@ -4,218 +4,208 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
 
-<div class="container">
-    <h1 class="text-center mb-4">Upload Your Fitness Data</h1>
-    <p class="text-center text-muted">Choose a category and enter your latest health data or upload a CSV file.</p>
+<h1 class="text-center mb-4">Upload Your Fitness Data</h1>
+<p class="text-center text-muted">Choose a category and enter your latest health data or upload a CSV file.</p>
 
-    <!-- Display flash messages with Bootstrap alerts -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <!-- Unified CSV Upload Form -->
-    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
-        <input type="hidden" name="category" id="csvCategory" value="exercise">
-
-        <div class="row justify-content-center mb-2 align-items-end">
-            <!-- File Input -->
-            <div class="col-md-6">
-                <label class="form-label">Upload CSV (auto-selects based on tab)</label>
-                <input type="file" name="csv_file" class="form-control" accept=".csv" required>
-            </div>
-            <!-- Submit Button -->
-            <div class="col-md-2 text-end mt-4">
-                <button type="submit" class="btn btn-success">Upload CSV</button>
-            </div>
-        </div>
-    </form>
-
-    <!-- Tabs -->
-    <ul class="nav nav-tabs mb-4 justify-content-center" id="uploadTabs" role="tablist">
-        <li class="nav-item">
-            <button class="nav-link active" id="exercise-tab" data-bs-toggle="tab" data-bs-target="#exercise" type="button" role="tab">🏋️ Exercise</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="diet-tab" data-bs-toggle="tab" data-bs-target="#diet" type="button" role="tab">🍽️ Diet</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" id="sleep-tab" data-bs-toggle="tab" data-bs-target="#sleep" type="button" role="tab">😴 Sleep</button>
-        </li>
-    </ul>
-
-    <!-- Tab Content -->
-    <div class="tab-content" id="uploadTabsContent">
-        <!-- Exercise Form -->
-        <div class="tab-pane fade show active" id="exercise" role="tabpanel">
-            <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
-                <div class="mb-3">
-                    <label class="form-label">Workout Type</label>
-                    <select class="form-select" name="workout_type" required>
-                        <option value="" selected disabled>Select workout</option>
-                        <option>Walking</option>
-                        <option>Running</option>
-                        <option>Biking</option>
-                        <option>Hiking</option>
-                        <option>Pool Swim</option>
-                        <option>Treadmill</option>
-                        <option>Weight Machine</option>
-                        <option>Yoga</option>
-                        <option>Other Workout</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Intensity</label>
-                    <select class="form-select" name="intensity">
-                        <option>Low</option>
-                        <option>Medium</option>
-                        <option>High</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Duration (minutes)</label>
-                    <input type="number" name="duration" class="form-control" min="1" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Distance (km)</label>
-                    <input type="number" step="0.1" name="distance" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Calories Burned</label>
-                    <input type="number" name="calories" class="form-control" min="0">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Heart Rate</label>
-                    <input type="number" name="heart_rate" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="date" class="form-control" value="{{ date_default }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Notes (optional)</label>
-                    <textarea name="notes" class="form-control" rows="2"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">Save Exercise</button>
-            </form>
-        </div>
-
-        <!-- Diet Form -->
-        <div class="tab-pane fade" id="diet" role="tabpanel">
-            <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light mt-3">
-                <div class="mb-3">
-                    <label class="form-label">Meal Type</label>
-                    <select class="form-select" name="meal_type" required>
-                        <option selected disabled>Select meal</option>
-                        <option>Breakfast</option>
-                        <option>Lunch</option>
-                        <option>Dinner</option>
-                        <option>Snack</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Food Name</label>
-                    <input type="text" name="food_name" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Calories</label>
-                    <input type="number" name="diet_calories" class="form-control" min="0" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Meal Time</label>
-                    <input type="time" name="meal_time" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Protein (g)</label>
-                    <input type="number" name="protein" class="form-control" step="0.01">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Carbs (g)</label>
-                    <input type="number" name="carbs" class="form-control" step="0.01">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Fats (g)</label>
-                    <input type="number" name="fats" class="form-control" step="0.01">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Water Intake (ml)</label>
-                    <input type="number" name="water" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Date</label>
-                    <input type="date" name="diet_date" class="form-control" value="{{ date_default }}" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Notes (optional)</label>
-                    <textarea name="diet_notes" class="form-control" rows="2"></textarea>
-                </div>
-                <button type="submit" class="btn btn-warning w-100">Save Diet Entry</button>
-            </form>
-        </div>
-
-        <!-- Sleep Form -->
-        <div class="tab-pane fade" id="sleep" role="tabpanel">
-            <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light mt-3">
-                <div class="mb-3">
-                    <label class="form-label">Sleep Start</label>
-                    <input type="datetime-local" name="sleep_start" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Sleep End</label>
-                    <input type="datetime-local" name="sleep_end" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Sleep Quality</label>
-                    <select class="form-select" name="sleep_quality" required>
-                        <option selected disabled>Select quality</option>
-                        <option>Poor</option>
-                        <option>Fair</option>
-                        <option>Good</option>
-                        <option>Excellent</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Wake-ups</label>
-                    <input type="number" name="wake_ups" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Sleep Efficiency (%)</label>
-                    <input type="number" name="efficiency" class="form-control" min="0" max="100" step="1">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Sleep Type</label>
-                    <select class="form-select" name="sleep_type">
-                        <option>Nap</option>
-                        <option>Night</option>
-                        <option>Both</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Notes (optional)</label>
-                    <textarea name="sleep_notes" class="form-control" rows="2"></textarea>
-                </div>
-                <button type="submit" class="btn btn-info w-100">Save Sleep Entry</button>
-            </form>
-        </div>
+<!-- Unified CSV Upload Form -->
+<form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
+  <input type="hidden" name="category" id="csvCategory" value="exercise">
+  
+  <div class="row justify-content-center mb-2 align-items-end">
+    <!-- File Input (left or center) -->
+    <div class="col-md-6">
+      <label class="form-label">Upload CSV (auto-selects based on tab)</label>
+      <input type="file" name="csv_file" class="form-control" required>
     </div>
-</div>
+
+    <!-- Submit Button (right aligned) -->
+    <div class="col-md-2 text-end mt-4">
+      <button type="submit" class="btn btn-success">Upload CSV</button>
+    </div>
+  </div>
+</form>
+
 
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const hiddenInput = document.getElementById("csvCategory");
-        const tabButtons = document.querySelectorAll("#uploadTabs button");
-        tabButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const selectedTab = button.getAttribute("data-bs-target").substring(1); // "exercise", "diet", "sleep"
-                hiddenInput.value = selectedTab;
-            });
-        });
+  document.addEventListener("DOMContentLoaded", () => {
+    const hiddenInput = document.getElementById("csvCategory");
+
+    const tabButtons = document.querySelectorAll("#uploadTabs button");
+    tabButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const selectedTab = button.getAttribute("data-bs-target").substring(1); // "exercise", "diet", "sleep"
+        hiddenInput.value = selectedTab;
+      });
     });
+  });
 </script>
+
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4 justify-content-center" id="uploadTabs" role="tablist">
+  <li class="nav-item">
+    <button class="nav-link active" id="exercise-tab" data-bs-toggle="tab" data-bs-target="#exercise" type="button" role="tab">🏋️ Exercise</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" id="diet-tab" data-bs-toggle="tab" data-bs-target="#diet" type="button" role="tab">🍽️ Diet</button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link" id="sleep-tab" data-bs-toggle="tab" data-bs-target="#sleep" type="button" role="tab">😴 Sleep</button>
+  </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="uploadTabsContent">
+  <!-- Exercise Form -->
+  <div class="tab-pane fade show active" id="exercise" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
+      <div class="mb-3">
+        <label class="form-label">Workout Type</label>
+        <select class="form-select" name="workout_type" required>
+          <option value="" selected disabled>Select workout</option>
+          <option>Walking</option>
+          <option>Running</option>
+          <option>Biking</option>
+          <option>Hiking</option>
+          <option>Pool Swim</option>
+          <option>Treadmill</option>
+          <option>Weight Machine</option>
+          <option>Yoga</option>
+          <option>Other Workout</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Intensity</label>
+        <select class="form-select" name="intensity">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Duration (minutes)</label>
+        <input type="number" name="duration" class="form-control" min="1" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Distance (km)</label>
+        <input type="number" step="0.1" name="distance" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Calories Burned</label>
+        <input type="number" name="calories" class="form-control" min="0">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Heart Rate</label>
+        <input type="number" name="heart_rate" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="date" class="form-control" value="{{ date_default }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Notes (optional)</label>
+        <textarea name="notes" class="form-control" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Save Exercise</button>
+    </form>
+  </div>
+
+  <!-- Diet Tab -->
+  <div class="tab-pane fade" id="diet" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light mt-3">
+      <div class="mb-3">
+        <label class="form-label">Meal Type</label>
+        <select class="form-select" name="meal_type" required>
+          <option selected disabled>Select meal</option>
+          <option>Breakfast</option>
+          <option>Lunch</option>
+          <option>Dinner</option>
+          <option>Snack</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Food Name</label>
+        <input type="text" name="food_name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Calories</label>
+        <input type="number" name="diet_calories" class="form-control" min="0" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Meal Time</label>
+        <input type="time" name="meal_time" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Protein (g)</label>
+        <input type="number" name="protein" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Carbs (g)</label>
+        <input type="number" name="carbs" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Fats (g)</label>
+        <input type="number" name="fats" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Water Intake (ml)</label>
+        <input type="number" name="water" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Date</label>
+        <input type="date" name="diet_date" class="form-control" value="{{ date_default }}" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Notes (optional)</label>
+        <textarea name="diet_notes" class="form-control" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-warning w-100">Save Diet Entry</button>
+    </form>
+  </div>
+
+  <!-- Sleep Tab -->
+  <div class="tab-pane fade" id="sleep" role="tabpanel">
+    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light mt-3">
+      <div class="mb-3">
+        <label class="form-label">Sleep Start</label>
+        <input type="datetime-local" name="sleep_start" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep End</label>
+        <input type="datetime-local" name="sleep_end" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep Quality</label>
+        <select class="form-select" name="sleep_quality" required>
+          <option selected disabled>Select quality</option>
+          <option>Poor</option>
+          <option>Fair</option>
+          <option>Good</option>
+          <option>Excellent</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Wake-ups</label>
+        <input type="number" name="wake_ups" class="form-control">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep Efficiency (%)</label>
+        <input type="number" name="efficiency" class="form-control" min="0" max="100" step="1">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sleep Type</label>
+        <select class="form-select" name="sleep_type">
+          <option>Nap</option>
+          <option>Night</option>
+          <option>Both</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Notes (optional)</label>
+        <textarea name="sleep_notes" class="form-control" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-info w-100">Save Sleep Entry</button>
+    </form>
+  </div>
+</div>
 {% endblock %}
