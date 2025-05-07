@@ -1,0 +1,10 @@
+
+.navbar .dropdown-toggle img {
+    border: 2px solid #fff;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .navbar .dropdown-toggle:hover img {
+    transform: scale(1.05);
+  }
+  

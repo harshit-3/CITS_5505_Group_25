@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import db, User, ExerciseEntry, DietEntry, SleepEntry
 from markupsafe import Markup
@@ -610,3 +610,43 @@ def share():
                            sleep_stage_labels=sleep_stage_labels,
                            sleep_stage_counts=sleep_stage_counts,
                            )
+
+
+
+@main.route("/profile")
+def profile():
+    if "user_id" not in session:
+        return redirect(url_for("main.login"))
+    user = User.query.get(session["user_id"])
+    return render_template("profile.html", user=user)
+
+@main.route("/profile/update", methods=["POST"])
+def update_profile():
+    if "user_id" not in session:
+        return jsonify({"status": "error", "message": "Not logged in"})
+
+    user = User.query.get(session["user_id"])
+    user.first_name = request.form.get("first_name", user.first_name)
+    user.last_name = request.form.get("last_name", user.last_name)
+    user.birthdate = request.form.get("birthdate", user.birthdate)
+    user.gender = request.form.get("gender", user.gender)
+    user.country = request.form.get("country", user.country)
+
+    db.session.commit()
+    return jsonify({"status": "success", "message": "Profile updated"})
+
+@main.route("/profile/password", methods=["POST"])
+def change_password():
+    if "user_id" not in session:
+        return jsonify({"status": "error", "message": "Not logged in"})
+
+    user = User.query.get(session["user_id"])
+    old_password = request.form["old_password"]
+    new_password = request.form["new_password"]
+
+    if not check_password_hash(user.password, old_password):
+        return jsonify({"status": "error", "message": "Old password is incorrect"})
+
+    user.password = generate_password_hash(new_password)
+    db.session.commit()
+    return jsonify({"status": "success", "message": "Password updated successfully"})
