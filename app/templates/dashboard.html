@@ -17,6 +17,7 @@
 <!-- Main Content -->
 <main class="container mt-5">
     <!-- Display flash messages with Bootstrap alerts -->
+<div id="flash-messages" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 600px;">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -27,6 +28,7 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+</div>
 
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5">
     <!-- Upload Data Card -->
@@ -102,6 +104,17 @@
     duration: 800,
     once: true
   });
+
+    // JavaScript to auto-dismiss flash messages
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+            }, 2000); // 2 seconds
+        });
+    });
 </script>
 
 {% endblock %}

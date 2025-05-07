@@ -9,6 +9,7 @@
     <p class="text-center text-muted">Choose a category and enter your latest health data or upload a CSV file.</p>
 
     <!-- Display flash messages with Bootstrap alerts -->
+<div id="flash-messages" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 600px;">
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
             {% for category, message in messages %}
@@ -19,6 +20,7 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
+</div>
 
     <!-- Unified CSV Upload Form -->
     <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
@@ -216,6 +218,15 @@
                 hiddenInput.value = selectedTab;
             });
         });
+
+        // JavaScript to auto-dismiss flash messages
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                    alert.classList.add('fade');
+                }, 2000);
+            });
     });
 </script>
 {% endblock %}
