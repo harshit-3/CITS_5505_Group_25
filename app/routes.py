@@ -90,14 +90,14 @@ def upload():
 
             if not file or file.filename == '':
                 flash("No file selected.", "danger")
-                return redirect(url_for("main.dashboard"))
+                return redirect(url_for("main.upload"))
 
             import pandas as pd
             try:
                 df = pd.read_csv(file)
             except Exception:
-                flash(f"Invalid CSV format: {str(e)}", "danger")
-                return redirect(url_for("main.dashboard"))
+                flash("Invalid CSV format.", "danger")
+                return redirect(url_for("main.upload"))
 
             try:
                 if category == "exercise":
@@ -147,13 +147,13 @@ def upload():
                         db.session.add(entry)
                 else:
                     flash("Invalid upload category.", "danger")
-                    return redirect(url_for("main.dashboard"))
+                    return redirect(url_for("main.upload"))
 
                 db.session.commit()
                 flash(f"{category.capitalize()} data uploaded from CSV!", "success")
             except Exception as e:
                 flash(f"Error processing CSV data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.upload"))
 
         # Exercise Form
         elif "workout_type" in request.form:
@@ -175,7 +175,7 @@ def upload():
             except Exception as e:
                 db.session.rollback()
                 flash(f"Failed to save exercise data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.upload"))
 
         # Diet Form
         elif "meal_type" in request.form:
@@ -199,7 +199,7 @@ def upload():
             except Exception as e:
                 db.session.rollback()
                 flash(f"Failed to save diet data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.upload"))
 
         # Sleep Form
         elif "sleep_start" in request.form:
@@ -220,11 +220,11 @@ def upload():
             except Exception as e:
                 db.session.rollback()
                 flash(f"Failed to save sleep data: {str(e)}", "danger")
-            return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.upload"))
         else:
             # Fallback for invalid or unhandled form submissions
             flash("Invalid form submission. Please check your input.", "danger")
-            return redirect(url_for("main.dashboard"))
+            return redirect(url_for("main.upload"))
 
     return render_template("upload.html")
 
