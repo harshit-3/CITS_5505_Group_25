@@ -443,6 +443,10 @@ def delete_sleep(entry_id):
 
     return redirect(url_for("main.sleep_records"))
 
+# 在 routes.py 中需要添加的修改（仅 share 函数部分）
+
+# 在 routes.py 中需要添加的修改（仅 share 函数部分）
+
 @main.route("/share")
 def share():
     if "user_id" not in session:
@@ -548,9 +552,37 @@ def share():
 
     summary = f"This week, you exercised for a total of {weekly_exercise_duration} minutes with a sleep efficiency of {avg_sleep_efficiency}%. Great job!"
 
-    # Pass data to share.html
+    # Generate a unique share token and URL
+    import hashlib
+    from urllib.parse import quote
+
+    # Create a unique share token based on user ID and timestamp
+    share_token = hashlib.md5(f"{user_id}_{datetime.now().timestamp()}".encode()).hexdigest()[:10]
+
+    # Get the absolute URL (including domain) for the share page
+    if request.headers.get('X-Forwarded-Proto'):
+        protocol = request.headers.get('X-Forwarded-Proto')
+    else:
+        protocol = 'https' if request.is_secure else 'http'
+
+    host = request.headers.get('Host', request.host)
+    base_url = f"{protocol}://{host}"
+
+    # Construct the share URL with token
+    share_url = f"{base_url}{url_for('main.share')}?token={share_token}"
+
+    # Store token in database or session for verification if needed
+    if 'share_tokens' not in session:
+        session['share_tokens'] = []
+
+    session['share_tokens'].append(share_token)
+    if len(session['share_tokens']) > 10:
+        session['share_tokens'] = session['share_tokens'][-10:]
+
+    # Pass data to share.html template
     return render_template("share.html",
                            summary=summary,
+                           share_url=share_url,
                            exercise_dates=exercise_dates,
                            exercise_durations=exercise_durations,
                            exercise_calories=exercise_calories,
