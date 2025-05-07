@@ -1,12 +1,14 @@
 window.onload = function () {
+    // Calculate macronutrient values
     const macronutrientValues = [
         chartData.diet_protein.reduce((a, b) => a + b, 0),
         chartData.diet_carbs.reduce((a, b) => a + b, 0),
         chartData.diet_fats.reduce((a, b) => a + b, 0)
     ];
 
+    // Chart configurations
     const chartConfigs = {
-        exerciseChart1: {
+        DailyExerciseDurationChart: {
             type: 'line',
             data: {
                 labels: chartData.exercise_dates,
@@ -27,7 +29,7 @@ window.onload = function () {
                 }
             }
         },
-        exerciseChart2: {
+        ExerciseIntensityLevelsChart: {
             type: 'bar',
             data: {
                 labels: chartData.exercise_intensity_labels,
@@ -45,7 +47,7 @@ window.onload = function () {
                 }
             }
         },
-        exerciseChart3: {
+        CaloriesBurnedperSessionChart: {
             type: 'line',
             data: {
                 labels: chartData.exercise_dates,
@@ -66,7 +68,7 @@ window.onload = function () {
                 }
             }
         },
-        exerciseChart4: {
+        WeeklyExerciseFrequencyChart: {
             type: 'bar',
             data: {
                 labels: chartData.exercise_frequency_labels,
@@ -84,7 +86,7 @@ window.onload = function () {
                 }
             }
         },
-        dietChart1: {
+        DailyCaloricIntakeChart: {
             type: 'line',
             data: {
                 labels: chartData.diet_dates,
@@ -105,7 +107,7 @@ window.onload = function () {
                 }
             }
         },
-        dietChart2: {
+        MacronutrientBreakdownChart: {
             type: 'doughnut',
             data: {
                 labels: ["Protein", "Carbs", "Fats"],
@@ -124,7 +126,7 @@ window.onload = function () {
                 }
             }
         },
-        dietChart3: {
+        WaterConsumptionChart: {
             type: 'line',
             data: {
                 labels: chartData.diet_dates,
@@ -145,7 +147,7 @@ window.onload = function () {
                 }
             }
         },
-        dietChart4: {
+        WeeklyMealFrequencyChart: {
             type: 'bar',
             data: {
                 labels: chartData.meal_labels,
@@ -163,7 +165,7 @@ window.onload = function () {
                 }
             }
         },
-        sleepChart1: {
+        DailySleepDurationChart: {
             type: 'line',
             data: {
                 labels: chartData.sleep_dates,
@@ -184,7 +186,7 @@ window.onload = function () {
                 }
             }
         },
-        sleepChart2: {
+        SleepQualityScoresChart: {
             type: 'line',
             data: {
                 labels: chartData.sleep_dates,
@@ -205,7 +207,7 @@ window.onload = function () {
                 }
             }
         },
-        sleepChart3: {
+        SleepTypeDistributionChart: {
             type: 'doughnut',
             data: {
                 labels: chartData.sleep_stage_labels,
@@ -224,7 +226,7 @@ window.onload = function () {
                 }
             }
         },
-        sleepChart4: {
+        SleepWakeupsChart: {
             type: 'bar',
             data: {
                 labels: chartData.sleep_wake_ups_dates,
@@ -244,24 +246,34 @@ window.onload = function () {
         }
     };
 
+    // Create all charts
     const charts = {};
     for (const [chartId, config] of Object.entries(chartConfigs)) {
         const ctx = document.getElementById(chartId)?.getContext("2d");
         if (ctx) {
             charts[chartId] = new Chart(ctx, config);
+        } else {
+            console.error(`Canvas element for ${chartId} not found`);
         }
     }
 
+    // Download individual chart function
     window.downloadChart = function(chartId) {
         const chart = charts[chartId];
         if (chart) {
-            const url = chart.toBase64Image();
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${chartId}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            // Ensure the chart is fully rendered
+            chart.update();
+            setTimeout(() => {
+                const url = chart.toBase64Image();
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${chartId}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }, 100);
+        } else {
+            console.error(`Chart ${chartId} not found`);
         }
     };
 };
