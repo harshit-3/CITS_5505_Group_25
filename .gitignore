@@ -10,4 +10,6 @@ __pycache__/
 *.db
 
 # macOS system files
-.DS_Store
+.DS_Store"__pycache__/" 
+"*.pyc" 
+"instance/tracker.db" 
