@@ -10,6 +10,7 @@ from flask import send_file
 from collections import Counter
 from collections import defaultdict
 import numpy as np
+from .models import db, User, ExerciseEntry, DietEntry, SleepEntry, Message  # Added Message to import
 
 main = Blueprint("main", __name__)
 
@@ -447,7 +448,7 @@ def delete_sleep(entry_id):
 
 # 在 routes.py 中需要添加的修改（仅 share 函数部分）
 
-@main.route("/share")
+@main.route("/share", methods=["GET", "POST"])
 def share():
     if "user_id" not in session:
         flash("Please log in to share your progress.", "warning")
@@ -578,6 +579,29 @@ def share():
     session['share_tokens'].append(share_token)
     if len(session['share_tokens']) > 10:
         session['share_tokens'] = session['share_tokens'][-10:]
+
+    # POST method handling to send messages
+    if request.method == "POST":
+        receiver_email = request.form.get("receiver_email")
+        receiver = User.query.filter_by(email=receiver_email).first()
+        if not receiver:
+            flash("User with this email not found.", "danger")
+            return redirect(url_for("main.share"))
+        if receiver.id == user_id:
+            flash("You cannot share with yourself.", "danger")
+            return redirect(url_for("main.share"))
+
+        # Create a new message
+        message = Message(
+            sender_id=user_id,
+            receiver_id=receiver.id,
+            content=summary,
+            is_read=False
+        )
+        db.session.add(message)
+        db.session.commit()
+        flash("Fitness information shared successfully!", "success")
+        return redirect(url_for("main.share"))
 
     # Pass data to share.html template
     return render_template("share.html",
