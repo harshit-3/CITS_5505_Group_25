@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 
 db = SQLAlchemy()
 
@@ -54,3 +54,14 @@ class SleepEntry(db.Model):
     efficiency = db.Column(db.Float)
     sleep_type = db.Column(db.String(20))
     notes = db.Column(db.Text)
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)  # Shared fitness information
+    is_read = db.Column(db.Boolean, default=False)  # Read/unread status
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  # Timestamp of the message
+
+    def __repr__(self):
+        return f'<Message from {self.sender_id} to {self.receiver_id} at {self.timestamp}>'
