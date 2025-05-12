@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Your Messages</h1>
+
+    <!-- Display flash messages with Bootstrap alerts, floating -->
+    <div id="flash-messages" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 600px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Received Messages -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Received Messages</h3>
+            <hr>
+            {% if received_messages %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>From</th>
+                            <th>Content</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in received_messages %}
+                            <tr>
+                                <td>{{ message.sender.email }}</td>
+                                <td>{{ message.content }}</td>
+                                <td>{{ message.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                <td>
+                                    {% if message.is_read %}
+                                        <span class="badge bg-success">Read</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Unread</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('main.messages') }}" style="display:inline;">
+                                        <input type="hidden" name="message_id" value="{{ message.id }}">
+                                        {% if message.is_read %}
+                                            <button type="submit" name="action" value="mark_unread" class="btn btn-sm btn-outline-secondary">Mark Unread</button>
+                                        {% else %}
+                                            <button type="submit" name="action" value="mark_read" class="btn btn-sm btn-outline-primary">Mark Read</button>
+                                        {% endif %}
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No received messages.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sent Messages -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Sent Messages</h3>
+            <hr>
+            {% if sent_messages %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>To</th>
+                            <th>Content</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for message in sent_messages %}
+                            <tr>
+                                <td>{{ message.receiver.email }}</td>
+                                <td>{{ message.content }}</td>
+                                <td>{{ message.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No sent messages.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to auto-dismiss flash messages -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+            }, 2000); //
+        });
+    });
+</script>
+{% endblock %}
