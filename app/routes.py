@@ -683,28 +683,43 @@ def messages():
 
     user_id = session["user_id"]
 
-    # Handle marking messages as read/unread
+    # Handle POST requests (manual marking or mark all as read)
     if request.method == "POST":
-        message_id = request.form.get("message_id")
         action = request.form.get("action")
-        message = Message.query.get_or_404(message_id)
+        message_id = request.form.get("message_id")
 
-        # Ensure the user is the receiver of the message
-        if message.receiver_id != user_id:
-            flash("You do not have permission to modify this message.", "danger")
+        # Handle one-click mark all as read
+        if action == "mark_all_read":
+            unread_messages = Message.query.filter_by(receiver_id=user_id, is_read=False).all()
+            if unread_messages:
+                for message in unread_messages:
+                    message.is_read = True
+                db.session.commit()
+                flash("All messages have been marked as read.", "success")
+            else:
+                flash("No unread messages to mark as read.", "info")
             return redirect(url_for("main.messages"))
 
-        if action == "mark_read":
-            message.is_read = True
-            flash("Message marked as read.", "success")
-        elif action == "mark_unread":
-            message.is_read = False
-            flash("Message marked as unread.", "success")
+        # Handle manual marking messages as read/unread
+        if message_id:
+            message = Message.query.get_or_404(message_id)
 
-        db.session.commit()
-        return redirect(url_for("main.messages"))
+            # Ensure the user is the receiver of the message
+            if message.receiver_id != user_id:
+                flash("You do not have permission to modify this message.", "danger")
+                return redirect(url_for("main.messages"))
 
-    # Fetch sent and received messages
+            if action == "mark_read":
+                message.is_read = True
+                flash("Message marked as read.", "success")
+            elif action == "mark_unread":
+                message.is_read = False
+                flash("Message marked as unread.", "success")
+
+            db.session.commit()
+            return redirect(url_for("main.messages"))
+
+    # Handle GET requests (display messages page)
     sent_messages = Message.query.filter_by(sender_id=user_id).order_by(Message.timestamp.desc()).all()
     received_messages = Message.query.filter_by(receiver_id=user_id).order_by(Message.timestamp.desc()).all()
 
