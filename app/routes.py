@@ -674,3 +674,10 @@ def change_password():
     user.password = generate_password_hash(new_password)
     db.session.commit()
     return jsonify({"status": "success", "message": "Password updated successfully"})
+
+@main.route("/messages")
+def messages():
+    if "user_id" not in session:
+        flash("Please log in to view your messages.", "warning")
+        return redirect(url_for("main.login"))
+    return "Messages page (to be implemented in Step 4)"

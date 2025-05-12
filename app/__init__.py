@@ -15,6 +15,14 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)  # Bind migrate after app is created
 
+    # Import models after db initialization to avoid circular imports
+    from . import models
+
+    # Context processor to inject Message model into all templates
+    @app.context_processor
+    def inject_message_model():
+        return dict(Message=models.Message)
+
     from .routes import main
     app.register_blueprint(main)
 
