@@ -55,6 +55,17 @@
 
     <!-- Exercise Records Card -->
     <div class="col" data-aos="zoom-in" data-aos-delay="300">
+      <a href="{{ url_for('main.share') }}" class="text-decoration-none">
+        <div class="card card-custom bg-secondary shadow-lg h-100 text-center p-4">
+          <div class="card-icon">🔗</div>
+          <h4 class="card-title">Share Progress</h4>
+          <p class="card-text">Generate and share your fitness reports</p>
+        </div>
+      </a>
+    </div>
+
+    <!-- Diet Records Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="400">
       <a href="{{ url_for('main.exercise_records') }}" class="text-decoration-none">
         <div class="card card-custom bg-success shadow-lg h-100 text-center p-4">
           <div class="card-icon">🏋️</div>
@@ -64,35 +75,25 @@
       </a>
     </div>
 
-    <!-- Diet Records Card -->
-    <div class="col" data-aos="zoom-in" data-aos-delay="400">
+    <!-- Sleep Records Card -->
+    <div class="col" data-aos="zoom-in" data-aos-delay="500">
       <a href="{{ url_for('main.diet_records') }}" class="text-decoration-none">
         <div class="card card-custom bg-warning shadow-lg h-100 text-center p-4">
           <div class="card-icon">🍽️</div>
           <h4 class="card-title">Diet Records</h4>
           <p class="card-text">See what you’ve eaten</p>
         </div>
-      </a>
-    </div>
-
-    <!-- Sleep Records Card -->
-    <div class="col" data-aos="zoom-in" data-aos-delay="500">
-      <a href="{{ url_for('main.sleep_records') }}" class="text-decoration-none">
-        <div class="card card-custom bg-info shadow-lg h-100 text-center p-4">
-          <div class="card-icon">💤</div>
-          <h4 class="card-title">Sleep Records</h4>
-          <p class="card-text">Review your sleep history</p>
-        </div>
+      
       </a>
     </div>
 
     <!-- Share Progress Card -->
     <div class="col" data-aos="zoom-in" data-aos-delay="600">
-      <a href="{{ url_for('main.share') }}" class="text-decoration-none">
-        <div class="card card-custom bg-secondary shadow-lg h-100 text-center p-4">
-          <div class="card-icon">🔗</div>
-          <h4 class="card-title">Share Progress</h4>
-          <p class="card-text">Generate and share your fitness reports</p>
+      <a href="{{ url_for('main.sleep_records') }}" class="text-decoration-none">
+        <div class="card card-custom bg-info shadow-lg h-100 text-center p-4">
+          <div class="card-icon">💤</div>
+          <h4 class="card-title">Sleep Records</h4>
+          <p class="card-text">Review your sleep history</p>
         </div>
       </a>
     </div>
