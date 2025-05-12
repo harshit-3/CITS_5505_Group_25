@@ -675,9 +675,39 @@ def change_password():
     db.session.commit()
     return jsonify({"status": "success", "message": "Password updated successfully"})
 
-@main.route("/messages")
+@main.route("/messages", methods=["GET", "POST"])
 def messages():
     if "user_id" not in session:
         flash("Please log in to view your messages.", "warning")
         return redirect(url_for("main.login"))
-    return "Messages page (to be implemented in Step 4)"
+
+    user_id = session["user_id"]
+
+    # Handle marking messages as read/unread
+    if request.method == "POST":
+        message_id = request.form.get("message_id")
+        action = request.form.get("action")
+        message = Message.query.get_or_404(message_id)
+
+        # Ensure the user is the receiver of the message
+        if message.receiver_id != user_id:
+            flash("You do not have permission to modify this message.", "danger")
+            return redirect(url_for("main.messages"))
+
+        if action == "mark_read":
+            message.is_read = True
+            flash("Message marked as read.", "success")
+        elif action == "mark_unread":
+            message.is_read = False
+            flash("Message marked as unread.", "success")
+
+        db.session.commit()
+        return redirect(url_for("main.messages"))
+
+    # Fetch sent and received messages
+    sent_messages = Message.query.filter_by(sender_id=user_id).order_by(Message.timestamp.desc()).all()
+    received_messages = Message.query.filter_by(receiver_id=user_id).order_by(Message.timestamp.desc()).all()
+
+    return render_template("messages.html",
+                           sent_messages=sent_messages,
+                           received_messages=received_messages)

@@ -62,6 +62,8 @@ class Message(db.Model):
     content = db.Column(db.Text, nullable=False)  # Shared fitness information
     is_read = db.Column(db.Boolean, default=False)  # Read/unread status
     timestamp = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))  # Timestamp of the message
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
 
     def __repr__(self):
         return f'<Message from {self.sender_id} to {self.receiver_id} at {self.timestamp}>'
