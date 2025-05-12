@@ -1,34 +1,54 @@
+/* Full viewport base */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Hero Section */
 .hero-bg {
   background-image: url('/static/images/index_background_pic.jpg');
-  background-size: 150%;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.5s ease;
   z-index: 1;
-
 }
+
 .hero-left {
   width: 50%;
   z-index: 2;
+  padding-left: 5%;
 }
 
 .hero-right {
   width: 50%;
   position: relative;
 }
+
+/* Hero Content Animation */
 .hero-content {
   opacity: 0;
+  transform: translateY(40px);
+  animation: fadeInUp 1s ease-out forwards;
+  animation-delay: 1.2s;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-content h1 {
   font-size: 3.5rem;
-  margin: 0 0 20px;
   color: #fff;
-}
-
-.hero-content p {
-  font-size: 1.2rem;
-  margin-bottom: 30px;
-  color: #ccc;
+  margin-bottom: 20px;
 }
 
 .hero-content .btn-primary {
@@ -39,8 +59,8 @@
   padding: 16px 36px;
   font-size: 1.1rem;
   font-weight: 600;
-  transition: background-color 0.3s ease, transform 0.3s ease;
   opacity: 0;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .hero-content .btn-primary:hover {
@@ -48,13 +68,12 @@
   transform: translateY(-2px);
 }
 
-
+/* Features Section */
 .features-section {
   padding: 100px 40px;
   background-color: #000;
   color: #fff;
   text-align: center;
-  transition: background 0.5s ease-in-out;
 }
 
 .features-section h2 {
@@ -62,33 +81,36 @@
   font-weight: 700;
   margin-bottom: 60px;
   letter-spacing: -0.5px;
-  color: #fff;
 }
 
 .feature-column {
   flex: 1;
   min-width: 280px;
   max-width: 340px;
-  text-align: left;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   padding: 24px 16px;
-  backdrop-filter: blur(4px);
+  margin-bottom: 20px;
+  backdrop-filter: blur(6px);
+  transition: transform 0.3s ease;
+}
+
+.feature-column:hover {
+  transform: translateY(-5px);
 }
 
 .feature-column h3 {
-  color: #fff;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   font-weight: 600;
   border-bottom: 2px solid #fff;
   padding-bottom: 10px;
   margin-bottom: 16px;
-  letter-spacing: 0.01em;
   text-align: center;
 }
 
 .feature-column ul {
-  padding-left: 20px;
+  list-style: none;
+  padding-left: 0;
   margin: 0;
 }
 
@@ -98,7 +120,7 @@
   color: #eee;
 }
 
-
+/* Button */
 .btn-outline {
   background-color: transparent;
   border: 2px solid #fff;
@@ -116,25 +138,31 @@
   border-color: #ccc;
 }
 
-
+/* Footer */
 .site-footer {
-  width: 100%;
   background-color: #000;
   color: #fff;
   padding: 40px 0;
-  margin-top: 80px;
   text-align: center;
 }
 
-.site-footer .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-html, body {
+.site-footer p {
   margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-left, .hero-right {
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .features-section {
+    padding: 60px 20px;
+  }
 }

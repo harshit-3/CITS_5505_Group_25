@@ -1,34 +1,29 @@
-
 $(document).ready(function () {
-  //  Background image slide into animation (Slide in from the right and fade in)
-  $(".hero-bg").css({ right: "-100%", left: "auto", opacity: 0 }).animate(
-    { right: "0%", opacity: 1 },
-    1500,
-    "swing"
-  );
+  // Animate hero background fade in
+  $(".hero-bg").css({ opacity: 0 }).animate({ opacity: 1 }, 1500);
 
-  // delay 1.2s
+  // Animate hero content fade + slide in
   setTimeout(function () {
-    $(".hero-content").css({ left: "-50px", opacity: 0, position: "relative" }).animate(
-      { left: "0", opacity: 1 },
+    $(".hero-content").css({ opacity: 0, position: "relative", top: "40px" }).animate(
+      { top: "0", opacity: 1 },
       1000
     );
-  }, 1200);
+  }, 1000);
 
-
+  // Show button fade-in
   setTimeout(function () {
-    $(".hero-content .btn-primary").fadeTo(4000, 1);
+    $(".hero-content .btn-primary").fadeTo(1500, 1);
   }, 1600);
 });
- var typed = new Typed('#typed-text', {
-    strings: [
-      "CITS5505 - Group25",
-    ],
-    typeSpeed: 40,
-    backSpeed: 20,
-    backDelay: 1500,
-    startDelay: 300,
-    fadeOut: true,
-    smartBackspace: false,
-    loop: true
-  });
+
+// Typed.js initialization
+var typed = new Typed('#typed-text', {
+  strings: ["CITS5505 - Group25", "Track. Analyze. Thrive."],
+  typeSpeed: 40,
+  backSpeed: 20,
+  backDelay: 2000,
+  startDelay: 300,
+  loop: true,
+  fadeOut: true,
+  smartBackspace: false
+});
