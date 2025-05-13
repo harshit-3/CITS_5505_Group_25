@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Health Information for {{ user.email }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Health Information for {{ user.email }}</h1>
+
+    <!-- Display flash messages -->
+    <div id="flash-messages" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 600px;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Exercise Entries -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Recent Exercise Entries</h3>
+            <hr>
+            {% if exercise_entries %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Workout Type</th>
+                            <th>Duration (min)</th>
+                            <th>Calories</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in exercise_entries %}
+                            <tr>
+                                <td>{{ entry.date.strftime('%Y-%m-%d') if entry.date else 'N/A' }}</td>
+                                <td>{{ entry.workout_type or 'N/A' }}</td>
+                                <td>{{ entry.duration or 'N/A' }}</td>
+                                <td>{{ entry.calories or 'N/A' }}</td>
+                                <td>{{ entry.notes or 'None' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No exercise entries available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Diet Entries -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Recent Diet Entries</h3>
+            <hr>
+            {% if diet_entries %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Meal Type</th>
+                            <th>Food Name</th>
+                            <th>Calories</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in diet_entries %}
+                            <tr>
+                                <td>{{ entry.date.strftime('%Y-%m-%d') if entry.date else 'N/A' }}</td>
+                                <td>{{ entry.meal_type or 'N/A' }}</td>
+                                <td>{{ entry.food_name or 'N/A' }}</td>
+                                <td>{{ entry.calories or 'N/A' }}</td>
+                                <td>{{ entry.notes or 'None' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No diet entries available.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sleep Entries -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h3 class="card-title">Recent Sleep Entries</h3>
+            <hr>
+            {% if sleep_entries %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Sleep Start</th>
+                            <th>Sleep End</th>
+                            <th>Sleep Quality</th>
+                            <th>Efficiency (%)</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in sleep_entries %}
+                            <tr>
+                                <td>{{ entry.sleep_start.strftime('%Y-%m-%d %H:%M:%S') if entry.sleep_start else 'N/A' }}</td>
+                                <td>{{ entry.sleep_end.strftime('%Y-%m-%d %H:%M:%S') if entry.sleep_end else 'N/A' }}</td>
+                                <td>{{ entry.sleep_quality or 'N/A' }}</td>
+                                <td>{{ entry.efficiency or 'N/A' }}</td>
+                                <td>{{ entry.notes or 'None' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-muted">No sleep entries available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to auto-dismiss flash messages -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            setTimeout(() => {
+                alert.classList.remove('show');
+                alert.classList.add('fade');
+            }, 2000);
+        });
+    });
+</script>
+{% endblock %}
