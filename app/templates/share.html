@@ -47,7 +47,7 @@
         </div>
     </div>
 
-     <!-- Display flash messages with Bootstrap alerts, floating -->
+    <!-- Display flash messages with Bootstrap alerts, floating -->
     <div id="flash-messages" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 600px;">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -323,14 +323,14 @@
         });
     }
 
-    // Auto-dismiss flash messages after 5 seconds
+    // Auto-dismiss flash messages after 2 seconds
     document.addEventListener('DOMContentLoaded', function() {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {
             setTimeout(() => {
                 alert.classList.remove('show');
                 alert.classList.add('fade');
-            }, 2000); // 2 seconds
+            }, 2000);
         });
     });
 </script>
