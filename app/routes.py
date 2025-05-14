@@ -541,18 +541,8 @@ def share():
     sleep_stage_labels = list(sleep_stage_counter.keys())
     sleep_stage_counts = list(sleep_stage_counter.values())
 
-    # Generate motivational summary
-    today = datetime.today().date()
-    start_of_week = today - timedelta(days=today.weekday())
-    end_of_week = start_of_week + timedelta(days=6)
-
-    weekly_exercise_duration = sum(
-        e.duration or 0 for e in exercise_data if start_of_week <= e.date <= end_of_week
-    )
-    weekly_sleep_efficiency = [s.efficiency or 0 for s in sleep_data if start_of_week <= s.sleep_start.date() <= end_of_week]
-    avg_sleep_efficiency = round(np.mean(weekly_sleep_efficiency), 1) if weekly_sleep_efficiency else 0
-
-    summary = f"This week, I exercised for a total of {weekly_exercise_duration} minutes with a sleep efficiency of {avg_sleep_efficiency}%. Great job!"
+    # Set the fixed summary message
+    summary = "Here's my fitness progress this week! Check it out:"
 
     # Generate a unique share token and URL
     share_token = hashlib.md5(f"{user_id}_{datetime.now().timestamp()}".encode()).hexdigest()[:10]
