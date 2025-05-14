@@ -7,30 +7,30 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script>
     const chartData = {
-        exercise_dates: {{ exercise_dates | default("[]") | safe }},
-        exercise_durations: {{ exercise_durations | default("[]") | safe }},
-        exercise_calories: {{ exercise_calories | default("[]") | safe }},
-        exercise_heart_rate: {{ exercise_heart_rate | default("[]") | safe }},
-        exercise_types: {{ exercise_types | default("[]") | safe }},
-        exercise_intensity_labels: {{ exercise_intensity_labels | default("[]") | safe }},
-        exercise_intensity_counts: {{ exercise_intensity_counts | default("[]") | safe }},
-        exercise_frequency_labels: {{ exercise_frequency_labels | default("[]") | safe }},
-        exercise_frequency_values: {{ exercise_frequency_values | default("[]") | safe }},
-        diet_dates: {{ diet_dates | default("[]") | safe }},
-        diet_calories: {{ diet_calories | default("[]") | safe }},
-        diet_water: {{ diet_water | default("[]") | safe }},
-        diet_protein: {{ diet_protein | default("[]") | safe }},
-        diet_carbs: {{ diet_carbs | default("[]") | safe }},
-        diet_fats: {{ diet_fats | default("[]") | safe }},
-        meal_labels: {{ meal_labels | default("[]") | safe }},
-        meal_values: {{ meal_values | default("[]") | safe }},
-        sleep_dates: {{ sleep_dates | default("[]") | safe }},
-        sleep_duration: {{ sleep_duration | default("[]") | safe }},
-        sleep_efficiency: {{ sleep_efficiency | default("[]") | safe }},
-        sleep_stage_labels: {{ sleep_stage_labels | default("[]") | safe }},
-        sleep_stage_counts: {{ sleep_stage_counts | default("[]") | safe }},
-        sleep_wake_ups: {{ sleep_wake_ups | default("[]") | safe }},
-        sleep_wake_ups_dates: {{ sleep_wake_ups_dates | default("[]") | safe }}
+        exercise_dates: {{ exercise_dates | default([]) | tojson | safe }},
+    exercise_durations: {{ exercise_durations | default([]) | tojson | safe }},
+    exercise_calories: {{ exercise_calories | default([]) | tojson | safe }},
+    exercise_heart_rate: {{ exercise_heart_rate | default([]) | tojson | safe }},
+    exercise_types: {{ exercise_types | default([]) | tojson | safe }},
+    exercise_intensity_labels: {{ exercise_intensity_labels | default([]) | tojson | safe }},
+    exercise_intensity_counts: {{ exercise_intensity_counts | default([]) | tojson | safe }},
+    exercise_frequency_labels: {{ exercise_frequency_labels | default([]) | tojson | safe }},
+    exercise_frequency_values: {{ exercise_frequency_values | default([]) | tojson | safe }},
+    diet_dates: {{ diet_dates | default([]) | tojson | safe }},
+    diet_calories: {{ diet_calories | default([]) | tojson | safe }},
+    diet_water: {{ diet_water | default([]) | tojson | safe }},
+    diet_protein: {{ diet_protein | default([]) | tojson | safe }},
+    diet_carbs: {{ diet_carbs | default([]) | tojson | safe }},
+    diet_fats: {{ diet_fats | default([]) | tojson | safe }},
+    meal_labels: {{ meal_labels | default([]) | tojson | safe }},
+    meal_values: {{ meal_values | default([]) | tojson | safe }},
+    sleep_dates: {{ sleep_dates | default([]) | tojson | safe }},
+    sleep_duration: {{ sleep_duration | default([]) | tojson | safe }},
+    sleep_efficiency: {{ sleep_efficiency | default([]) | tojson | safe }},
+    sleep_stage_labels: {{ sleep_stage_labels | default([]) | tojson | safe }},
+    sleep_stage_counts: {{ sleep_stage_counts | default([]) | tojson | safe }},
+    sleep_wake_ups: {{ sleep_wake_ups | default([]) | tojson | safe }},
+    sleep_wake_ups_dates: {{ sleep_wake_ups_dates | default([]) | tojson | safe }}
     };
 </script>
 
@@ -47,17 +47,17 @@
         </div>
     </div>
 
-     <!-- Display flash messages with Bootstrap alerts, floating -->
+    <!-- Display flash messages with Bootstrap alerts, floating -->
     <div id="flash-messages" style="position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 1000; width: 90%; max-width: 600px;">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
     </div>
 
@@ -157,7 +157,9 @@
                                 <label for="receiver_email" class="form-label">Recipient mail address:</label>
                                 <input type="email" class="form-control" id="receiver_email" name="receiver_email" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Share via Email</button>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Share via Email</button>
+                            </div>
                         </form>
                     </div>
 
@@ -255,83 +257,4 @@
     </div>
 </div>
 
-<script>
-    // Copy Share Link function
-    function copyShareLink() {
-        const shareLink = document.getElementById('share-link');
-        shareLink.select();
-        document.execCommand('copy');
-
-        const copyMessage = document.getElementById('copy-message');
-        copyMessage.classList.remove('d-none');
-        setTimeout(() => {
-            copyMessage.classList.add('d-none');
-        }, 2000);
-    }
-
-    // Copy LinkedIn Text function
-    function copyLinkedInText() {
-        const tempInput = document.createElement('textarea');
-        tempInput.value = "Check out my fitness progress! {{ share_url }}";
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        alert('Text copied to clipboard! Just paste it in the LinkedIn post editor.');
-    }
-
-    // Download QR Code function
-    function downloadQRCode() {
-        const qrImage = document.querySelector('#qrcode img');
-        const qrUrl = qrImage.src.replace('size=200x200', 'size=400x400');
-        fetch(qrUrl)
-            .then(response => response.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'fitness-progress-qrcode.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            })
-            .catch(err => console.error('Error downloading QR code:', err));
-    }
-
-    // Download All Charts function
-    function downloadAllCharts() {
-        const chartIds = [
-            'DailyExerciseDurationChart',
-            'ExerciseIntensityLevelsChart',
-            'CaloriesBurnedperSessionChart',
-            'WeeklyExerciseFrequencyChart',
-            'DailyCaloricIntakeChart',
-            'MacronutrientBreakdownChart',
-            'WaterConsumptionChart',
-            'WeeklyMealFrequencyChart',
-            'DailySleepDurationChart',
-            'SleepQualityScoresChart',
-            'SleepTypeDistributionChart',
-            'SleepWakeupsChart'
-        ];
-
-        chartIds.forEach((chartId, index) => {
-            setTimeout(() => {
-                window.downloadChart(chartId);
-            }, index * 200); // Stagger downloads to ensure rendering
-        });
-    }
-
-    // Auto-dismiss flash messages after 5 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                alert.classList.remove('show');
-                alert.classList.add('fade');
-            }, 2000); // 2 seconds
-        });
-    });
-</script>
 {% endblock %}
