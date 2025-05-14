@@ -444,9 +444,6 @@ def delete_sleep(entry_id):
 
     return redirect(url_for("main.sleep_records"))
 
-# 在 routes.py 中需要添加的修改（仅 share 函数部分）
-
-# 在 routes.py 中需要添加的修改（仅 share 函数部分）
 
 
 @main.route("/share", methods=["GET", "POST"])
