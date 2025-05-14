@@ -1,3 +1,69 @@
+// Define global functions so that onclick events in HTML can access them
+function copyShareLink() {
+    const shareLink = document.getElementById('share-link');
+    shareLink.select();
+    document.execCommand('copy');
+
+    const copyMessage = document.getElementById('copy-message');
+    copyMessage.classList.remove('d-none');
+    setTimeout(() => {
+        copyMessage.classList.add('d-none');
+    }, 2000);
+}
+
+function copyLinkedInText() {
+    const tempInput = document.createElement('textarea');
+    const shareLink = document.getElementById('share-link').value;
+    tempInput.value = "Check out my fitness progress! " + shareLink;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    alert('Text copied to clipboard! Just paste it in the LinkedIn post editor.');
+}
+
+function downloadQRCode() {
+    const qrImage = document.querySelector('#qrcode img');
+    const qrUrl = qrImage.src.replace('size=200x200', 'size=400x400');
+    fetch(qrUrl)
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'fitness-progress-qrcode.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(err => console.error('Error downloading QR code:', err));
+}
+
+function downloadAllCharts() {
+    const chartIds = [
+        'DailyExerciseDurationChart',
+        'ExerciseIntensityLevelsChart',
+        'CaloriesBurnedperSessionChart',
+        'WeeklyExerciseFrequencyChart',
+        'DailyCaloricIntakeChart',
+        'MacronutrientBreakdownChart',
+        'WaterConsumptionChart',
+        'WeeklyMealFrequencyChart',
+        'DailySleepDurationChart',
+        'SleepQualityScoresChart',
+        'SleepTypeDistributionChart',
+        'SleepWakeupsChart'
+    ];
+
+    chartIds.forEach((chartId, index) => {
+        setTimeout(() => {
+            downloadChart(chartId);
+        }, index * 200); // Stagger downloads to ensure rendering
+    });
+}
+
+// 页面加载时初始化图表
 window.onload = function () {
     // Calculate macronutrient values
     const macronutrientValues = [
@@ -257,7 +323,7 @@ window.onload = function () {
         }
     }
 
-    // Download individual chart function
+    // Download individual chart function - 使其在全局范围内可用
     window.downloadChart = function(chartId) {
         const chart = charts[chartId];
         if (chart) {
@@ -276,4 +342,16 @@ window.onload = function () {
             console.error(`Chart ${chartId} not found`);
         }
     };
+
+    // 将downloadChart也映射到全局作用域
+    downloadChart = window.downloadChart;
+
+    // 初始化alert自动消失
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+        }, 2000); // 2 seconds
+    });
 };
