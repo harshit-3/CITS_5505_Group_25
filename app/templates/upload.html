@@ -98,8 +98,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Date</label>
-                    <input type="date" name="date" class="form-control" value="{{ date_default }}" required>
-                </div>
+<input type="date" name="date" class="form-control" value="{{ date_default }}" max="{{ date_default }}" required onkeydown="return false;">                </div>
                 <div class="mb-3">
                     <label class="form-label">Notes (optional)</label>
                     <textarea name="notes" class="form-control" rows="2"></textarea>
@@ -210,6 +209,12 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // Force all input[type="date"] to disable future dates visually (make them unselectable)
+        const today = new Date().toISOString().split("T")[0];
+        document.querySelectorAll('input[type="date"]').forEach(input => {
+            input.setAttribute('max', today);
+        });
+
         const hiddenInput = document.getElementById("csvCategory");
         const tabButtons = document.querySelectorAll("#uploadTabs button");
         tabButtons.forEach(button => {
