@@ -1,11 +1,12 @@
+import secrets
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from markupsafe import Markup
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import Counter
 from collections import defaultdict
 import hashlib
-from .models import db, User, ExerciseEntry, DietEntry, SleepEntry, Message
+from .models import db, User, ExerciseEntry, DietEntry, SleepEntry, Message, ShareToken
 
 main = Blueprint("main", __name__)
 
@@ -449,12 +450,10 @@ def share():
 
     user_id = session["user_id"]
 
-    # Fetch data similar to /analysis
     exercise_data = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date).all()
     diet_data = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date).all()
     sleep_data = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start).all()
 
-    # Exercise aggregation
     exercise_types = [e.workout_type for e in exercise_data]
     intensity_counter = Counter(exercise_types)
     exercise_intensity_labels = list(intensity_counter.keys())
@@ -485,7 +484,6 @@ def share():
         for d in exercise_dates
     ]
 
-    # Diet aggregation
     diet_calories_by_date = defaultdict(int)
     diet_water_by_date = defaultdict(int)
     for d in diet_data:
@@ -508,7 +506,6 @@ def share():
     meal_labels = list(meal_frequency.keys())
     meal_values = list(meal_frequency.values())
 
-    # Sleep aggregation
     sleep_duration_by_date = defaultdict(float)
     for s in sleep_data:
         date_str = s.sleep_start.strftime("%Y-%m-%d")
@@ -533,13 +530,17 @@ def share():
     sleep_stage_labels = list(sleep_stage_counter.keys())
     sleep_stage_counts = list(sleep_stage_counter.values())
 
-    # Set the fixed summary message
-    summary = "Here's my fitness progress this week! Check it out:"
+    # summary message
+    summary = (
+        f"Sharing the recording!" )
 
-    # Generate a unique share token and URL
-    share_token = hashlib.md5(f"{user_id}_{datetime.now().timestamp()}".encode()).hexdigest()[:10]
+    # Generate a secure share token and store in ShareToken
+    share_token = secrets.token_hex(16)
+    expires_at = datetime.utcnow() + timedelta(days=7)
+    share_token_entry = ShareToken(token=share_token, user_id=user_id, expires_at=expires_at)
+    db.session.add(share_token_entry)
+    db.session.commit()
 
-    # Get the absolute URL (including domain) for the health info page
     if request.headers.get('X-Forwarded-Proto'):
         protocol = request.headers.get('X-Forwarded-Proto')
     else:
@@ -547,19 +548,8 @@ def share():
 
     host = request.headers.get('Host', request.host)
     base_url = f"{protocol}://{host}"
-
-    # Construct the share URL with token pointing to /health_info/<token>
     share_url = f"{base_url}/health_info/{share_token}"
 
-    # Store token in session for verification
-    if 'share_tokens' not in session:
-        session['share_tokens'] = []
-
-    session['share_tokens'].append({'token': share_token, 'user_id': user_id})
-    if len(session['share_tokens']) > 10:
-        session['share_tokens'] = session['share_tokens'][-10:]
-
-    # POST method handling to send messages
     if request.method == "POST":
         receiver_email = request.form.get("receiver_email")
         receiver = User.query.filter_by(email=receiver_email).first()
@@ -570,7 +560,6 @@ def share():
             flash("You cannot share with yourself.", "danger")
             return redirect(url_for("main.share"))
 
-        # Create a new message with the share URL
         message_content = f"{summary} View my health information: {share_url}"
         message = Message(
             sender_id=user_id,
@@ -584,7 +573,6 @@ def share():
         flash("Health information shared successfully!", "success")
         return redirect(url_for("main.share"))
 
-    # Pass data to share.html template (without users)
     return render_template("share.html",
                            summary=summary,
                            share_url=share_url,
@@ -618,24 +606,20 @@ def share():
 # Health info route to display a user's health information using a token
 @main.route("/health_info/<token>")
 def health_info(token):
+    print(f"Health info session data: {session.items()}")
+    print(f"Cookies received: {request.cookies.get('session')}")
     if "user_id" not in session:
         flash("Please log in to view health information.", "warning")
-        return redirect(url_for("main.login"))
+        return redirect(url_for("main.login", next=request.url))
 
-    # Verify the token
-    share_tokens = session.get('share_tokens', [])
-    user_id = None
-    for token_entry in share_tokens:
-        if token_entry['token'] == token:
-            user_id = token_entry['user_id']
-            break
-
-    if not user_id:
+    share_token = ShareToken.query.filter_by(token=token).first()
+    print(f"ShareToken found: {share_token}")
+    if not share_token or share_token.expires_at < datetime.utcnow():
         flash("Invalid or expired share link.", "danger")
         return redirect(url_for("main.index"))
 
+    user_id = share_token.user_id
     user = User.query.get_or_404(user_id)
-    # Fetch recent health data (e.g., last 5 entries for each type)
     exercise_entries = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date.desc()).limit(5).all()
     diet_entries = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date.desc()).limit(5).all()
     sleep_entries = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start.desc()).limit(5).all()
@@ -645,7 +629,6 @@ def health_info(token):
                            exercise_entries=exercise_entries,
                            diet_entries=diet_entries,
                            sleep_entries=sleep_entries)
-
 
 @main.route("/profile")
 def profile():
@@ -735,9 +718,9 @@ def messages():
 
     # Process messages to render links as clickable HTML
     for message in sent_messages + received_messages:
-        # Check if the message content contains a URL (simplified check)
+        # Check if the message content contains a URL
         if "http://" in message.content or "https://" in message.content:
-            # Extract the URL (assuming the format "... View my health information: <URL>")
+            # Extract the URL
             parts = message.content.split("View my health information: ")
             if len(parts) > 1:
                 url = parts[1]
