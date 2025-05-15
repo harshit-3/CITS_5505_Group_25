@@ -1,16 +1,12 @@
+import secrets
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import db, User, ExerciseEntry, DietEntry, SleepEntry
 from markupsafe import Markup
 from datetime import datetime, timedelta
-import io
-import base64
-import matplotlib.pyplot as plt
-from flask import send_file
 from collections import Counter
 from collections import defaultdict
-import numpy as np
-from .models import db, User, ExerciseEntry, DietEntry, SleepEntry, Message  # Added Message to import
+import hashlib
+from .models import db, User, ExerciseEntry, DietEntry, SleepEntry, Message, ShareToken
 
 main = Blueprint("main", __name__)
 
@@ -444,9 +440,7 @@ def delete_sleep(entry_id):
 
     return redirect(url_for("main.sleep_records"))
 
-# 在 routes.py 中需要添加的修改（仅 share 函数部分）
 
-# 在 routes.py 中需要添加的修改（仅 share 函数部分）
 
 @main.route("/share", methods=["GET", "POST"])
 def share():
@@ -456,12 +450,10 @@ def share():
 
     user_id = session["user_id"]
 
-    # Fetch data similar to /analysis
     exercise_data = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date).all()
     diet_data = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date).all()
     sleep_data = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start).all()
 
-    # Exercise aggregation
     exercise_types = [e.workout_type for e in exercise_data]
     intensity_counter = Counter(exercise_types)
     exercise_intensity_labels = list(intensity_counter.keys())
@@ -492,7 +484,6 @@ def share():
         for d in exercise_dates
     ]
 
-    # Diet aggregation
     diet_calories_by_date = defaultdict(int)
     diet_water_by_date = defaultdict(int)
     for d in diet_data:
@@ -515,7 +506,6 @@ def share():
     meal_labels = list(meal_frequency.keys())
     meal_values = list(meal_frequency.values())
 
-    # Sleep aggregation
     sleep_duration_by_date = defaultdict(float)
     for s in sleep_data:
         date_str = s.sleep_start.strftime("%Y-%m-%d")
@@ -540,27 +530,17 @@ def share():
     sleep_stage_labels = list(sleep_stage_counter.keys())
     sleep_stage_counts = list(sleep_stage_counter.values())
 
-    # Generate motivational summary
-    today = datetime.today().date()
-    start_of_week = today - timedelta(days=today.weekday())
-    end_of_week = start_of_week + timedelta(days=6)
+    # summary message
+    summary = (
+        f"Sharing the recording!" )
 
-    weekly_exercise_duration = sum(
-        e.duration or 0 for e in exercise_data if start_of_week <= e.date <= end_of_week
-    )
-    weekly_sleep_efficiency = [s.efficiency or 0 for s in sleep_data if start_of_week <= s.sleep_start.date() <= end_of_week]
-    avg_sleep_efficiency = round(np.mean(weekly_sleep_efficiency), 1) if weekly_sleep_efficiency else 0
+    # Generate a secure share token and store in ShareToken
+    share_token = secrets.token_hex(16)
+    expires_at = datetime.utcnow() + timedelta(days=7)
+    share_token_entry = ShareToken(token=share_token, user_id=user_id, expires_at=expires_at)
+    db.session.add(share_token_entry)
+    db.session.commit()
 
-    summary = f"This week, you exercised for a total of {weekly_exercise_duration} minutes with a sleep efficiency of {avg_sleep_efficiency}%. Great job!"
-
-    # Generate a unique share token and URL
-    import hashlib
-    from urllib.parse import quote
-
-    # Create a unique share token based on user ID and timestamp
-    share_token = hashlib.md5(f"{user_id}_{datetime.now().timestamp()}".encode()).hexdigest()[:10]
-
-    # Get the absolute URL (including domain) for the share page
     if request.headers.get('X-Forwarded-Proto'):
         protocol = request.headers.get('X-Forwarded-Proto')
     else:
@@ -568,19 +548,8 @@ def share():
 
     host = request.headers.get('Host', request.host)
     base_url = f"{protocol}://{host}"
+    share_url = f"{base_url}/health_info/{share_token}"
 
-    # Construct the share URL with token
-    share_url = f"{base_url}{url_for('main.share')}?token={share_token}"
-
-    # Store token in database or session for verification if needed
-    if 'share_tokens' not in session:
-        session['share_tokens'] = []
-
-    session['share_tokens'].append(share_token)
-    if len(session['share_tokens']) > 10:
-        session['share_tokens'] = session['share_tokens'][-10:]
-
-    # POST method handling to send messages
     if request.method == "POST":
         receiver_email = request.form.get("receiver_email")
         receiver = User.query.filter_by(email=receiver_email).first()
@@ -591,19 +560,19 @@ def share():
             flash("You cannot share with yourself.", "danger")
             return redirect(url_for("main.share"))
 
-        # Create a new message
+        message_content = f"{summary} View my health information: {share_url}"
         message = Message(
             sender_id=user_id,
             receiver_id=receiver.id,
-            content=summary,
-            is_read=False
+            content=message_content,
+            is_read=False,
+            timestamp=datetime.utcnow()
         )
         db.session.add(message)
         db.session.commit()
-        flash("Fitness information shared successfully!", "success")
+        flash("Health information shared successfully!", "success")
         return redirect(url_for("main.share"))
 
-    # Pass data to share.html template
     return render_template("share.html",
                            summary=summary,
                            share_url=share_url,
@@ -632,10 +601,34 @@ def share():
                            sleep_type=sleep_type,
                            sleep_duration=sleep_duration,
                            sleep_stage_labels=sleep_stage_labels,
-                           sleep_stage_counts=sleep_stage_counts,
-                           )
+                           sleep_stage_counts=sleep_stage_counts)
 
+# Health info route to display a user's health information using a token
+@main.route("/health_info/<token>")
+def health_info(token):
+    print(f"Health info session data: {session.items()}")
+    print(f"Cookies received: {request.cookies.get('session')}")
+    if "user_id" not in session:
+        flash("Please log in to view health information.", "warning")
+        return redirect(url_for("main.login", next=request.url))
 
+    share_token = ShareToken.query.filter_by(token=token).first()
+    print(f"ShareToken found: {share_token}")
+    if not share_token or share_token.expires_at < datetime.utcnow():
+        flash("Invalid or expired share link.", "danger")
+        return redirect(url_for("main.index"))
+
+    user_id = share_token.user_id
+    user = User.query.get_or_404(user_id)
+    exercise_entries = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date.desc()).limit(5).all()
+    diet_entries = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date.desc()).limit(5).all()
+    sleep_entries = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start.desc()).limit(5).all()
+
+    return render_template("health_info.html",
+                           user=user,
+                           exercise_entries=exercise_entries,
+                           diet_entries=diet_entries,
+                           sleep_entries=sleep_entries)
 
 @main.route("/profile")
 def profile():
@@ -674,3 +667,65 @@ def change_password():
     user.password = generate_password_hash(new_password)
     db.session.commit()
     return jsonify({"status": "success", "message": "Password updated successfully"})
+
+@main.route("/messages", methods=["GET", "POST"])
+def messages():
+    if "user_id" not in session:
+        flash("Please log in to view your messages.", "warning")
+        return redirect(url_for("main.login"))
+
+    user_id = session["user_id"]
+
+    # Handle POST requests (manual marking or mark all as read)
+    if request.method == "POST":
+        action = request.form.get("action")
+        message_id = request.form.get("message_id")
+
+        # Handle one-click mark all as read
+        if action == "mark_all_read":
+            unread_messages = Message.query.filter_by(receiver_id=user_id, is_read=False).all()
+            if unread_messages:
+                for message in unread_messages:
+                    message.is_read = True
+                db.session.commit()
+                flash("All messages have been marked as read.", "success")
+            else:
+                flash("No unread messages to mark as read.", "info")
+            return redirect(url_for("main.messages"))
+
+        # Handle manual marking messages as read/unread
+        if message_id:
+            message = Message.query.get_or_404(message_id)
+
+            # Ensure the user is the receiver of the message
+            if message.receiver_id != user_id:
+                flash("You do not have permission to modify this message.", "danger")
+                return redirect(url_for("main.messages"))
+
+            if action == "mark_read":
+                message.is_read = True
+                flash("Message marked as read.", "success")
+            elif action == "mark_unread":
+                message.is_read = False
+                flash("Message marked as unread.", "success")
+
+            db.session.commit()
+            return redirect(url_for("main.messages"))
+
+# Handle GET requests (display messages page)
+    sent_messages = Message.query.filter_by(sender_id=user_id).order_by(Message.timestamp.desc()).all()
+    received_messages = Message.query.filter_by(receiver_id=user_id).order_by(Message.timestamp.desc()).all()
+
+    # Process messages to render links as clickable HTML
+    for message in sent_messages + received_messages:
+        # Check if the message content contains a URL
+        if "http://" in message.content or "https://" in message.content:
+            # Extract the URL
+            parts = message.content.split("View my health information: ")
+            if len(parts) > 1:
+                url = parts[1]
+                message.content = Markup(f'{parts[0]}View my health information: <a href="{url}" target="_blank">{url}</a>')
+
+    return render_template("messages.html",
+                           sent_messages=sent_messages,
+                           received_messages=received_messages)
