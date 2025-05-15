@@ -67,3 +67,12 @@ class Message(db.Model):
 
     def __repr__(self):
         return f'<Message from {self.sender_id} to {self.receiver_id} at {self.timestamp}>'
+
+
+class ShareToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(32), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    user = db.relationship('User', backref='share_tokens')
