@@ -1,14 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from markupsafe import Markup
-from datetime import datetime, timedelta
-import io
-import base64
-import matplotlib.pyplot as plt
-from flask import send_file
+from datetime import datetime
 from collections import Counter
 from collections import defaultdict
-import numpy as np
 import hashlib
 from .models import db, User, ExerciseEntry, DietEntry, SleepEntry, Message
 
