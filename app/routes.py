@@ -33,19 +33,17 @@ def register():
             first_name=request.form["first_name"],
             last_name=request.form["last_name"],
             email=email,
+            password=generate_password_hash(password),
             birthdate=request.form["birthdate"],
             gender=request.form["gender"],
             country=request.form["country"]
         )
-        new_user.set_password(password)  
-
         db.session.add(new_user)
         db.session.commit()
         flash("Registration successful! Please log in.", "success")
         return redirect(url_for("main.login"))
 
     return render_template("register.html")
-
 
 @main.route("/login", methods=["GET", "POST"])
 def login():
@@ -57,7 +55,7 @@ def login():
 
         if not user:
             return render_template("login.html", error="No account found with this email.")
-        if not user.check_password(password):  
+        if not check_password_hash(user.password, password):
             return render_template("login.html", error="Incorrect password.", email=email)
 
         session["user_id"] = user.id
@@ -65,6 +63,8 @@ def login():
         return redirect(url_for("main.dashboard"))
 
     return render_template("login.html")
+
+
 
 
 @main.route("/dashboard")
