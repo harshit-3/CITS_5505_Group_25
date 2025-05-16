@@ -1,15 +1,18 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timezone
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
+
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(100))
     last_name = db.Column(db.String(100))
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(200), nullable=False)
-    birthdate = db.Column(db.String(20))  
+    password_hash = db.Column(db.String(200), nullable=False)
+    birthdate = db.Column(db.String(20))
     gender = db.Column(db.String(20))
     country = db.Column(db.String(100))
 
@@ -17,6 +20,14 @@ class User(db.Model):
     exercise_entries = db.relationship("ExerciseEntry", backref="user", cascade="all, delete-orphan")
     diet_entries = db.relationship("DietEntry", backref="user", cascade="all, delete-orphan")
     sleep_entries = db.relationship("SleepEntry", backref="user", cascade="all, delete-orphan")
+
+    # Password handling
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 
 class ExerciseEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
