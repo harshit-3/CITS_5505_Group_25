@@ -17,13 +17,17 @@ import signal
 class AuthTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        run_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'run.py'))
         cls.server = subprocess.Popen(
-            [sys.executable, "run.py"],
+            [sys.executable, run_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid  # Start a process group to allow easy termination
         )
         time.sleep(2)  # Wait for Flask server to start
+        if cls.server.poll() is not None:
+            stderr_output = cls.server.stderr.read().decode()
+            raise RuntimeError(f"Flask failed to start:\n{stderr_output}")
         cls.app = create_app(TestConfig)
         cls.app_context = cls.app.app_context()
         cls.app_context.push()
