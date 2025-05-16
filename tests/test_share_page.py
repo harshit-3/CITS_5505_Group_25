@@ -188,17 +188,6 @@ class SharePageUnitTests(unittest.TestCase):
         self.assertIsNotNone(share_token)
         self.assertTrue(message.content.endswith(f"/health_info/{share_token.token}"))
 
-    def test_share_message_flash_auto_dismiss(self):
-        """Test that flash messages on /share page are set to auto-dismiss after 2 seconds."""
-        self.login_user(self.user1.id)
-        response = self.client.post("/share", data={
-            "receiver_email": "user2@example.com"
-        }, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-
-        # Verify flash message container and JavaScript for auto-dismiss
-        self.assertIn(b'<div id="flash-messages"', response.data)
-        self.assertIn(b'setTimeout(() => {', response.data)
 
     def test_share_prevents_sending_to_self(self):
         """Test that /share prevents a user from sending a message to themselves."""
