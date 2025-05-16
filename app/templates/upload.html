@@ -3,6 +3,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 
 <div class="container">
     <h1 class="text-center mb-4">Upload Your Fitness Data</h1>
@@ -207,31 +208,4 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        // Force all input[type="date"] to disable future dates visually (make them unselectable)
-        const today = new Date().toISOString().split("T")[0];
-        document.querySelectorAll('input[type="date"]').forEach(input => {
-            input.setAttribute('max', today);
-        });
-
-        const hiddenInput = document.getElementById("csvCategory");
-        const tabButtons = document.querySelectorAll("#uploadTabs button");
-        tabButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const selectedTab = button.getAttribute("data-bs-target").substring(1); // "exercise", "diet", "sleep"
-                hiddenInput.value = selectedTab;
-            });
-        });
-
-        // JavaScript to auto-dismiss flash messages
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    alert.classList.remove('show');
-                    alert.classList.add('fade');
-                }, 2000);
-            });
-    });
-</script>
 {% endblock %}

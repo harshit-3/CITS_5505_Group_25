@@ -62,16 +62,5 @@
     </div>
 </div>
 
-    <!-- JavaScript to auto-dismiss flash messages -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                alert.classList.remove('show');
-                alert.classList.add('fade');
-            }, 2000);
-        });
-    });
-</script>
+
 {% endblock %}
