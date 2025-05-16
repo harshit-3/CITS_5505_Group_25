@@ -18,8 +18,9 @@ class DashboardTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Start the Flask app in a subprocess
+        run_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'run.py'))
         cls.server = subprocess.Popen(
-            [sys.executable, "run.py"],
+            [sys.executable, run_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             preexec_fn=os.setsid  # Allows us to later terminate the whole process group
