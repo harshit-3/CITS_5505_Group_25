@@ -3,19 +3,17 @@
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
-
-<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<div class="container-fluid vh-100 d-flex p-0 bg-black text-white position-relative">
-
-  <!-- the left side content -->
+<div class="container-fluid vh-100 d-flex p-0 bg-black text-white position-relative overflow-hidden">
+  <!-- Left Side Content -->
   <div class="d-flex flex-column justify-content-center ps-5 hero-left">
     <div class="hero-content">
       <div class="hero-text">
         <h1 class="display-4">
-          <span id="typed-text"></span>
+          <span id="typed-text">Track. Analyze. Thrive.</span>
         </h1>
         <ul class="team-list">
           <li>Xu Li 24269773</li>
@@ -28,41 +26,37 @@
     </div>
   </div>
 
-  <!-- the right side pic -->
+  <!-- Right Side Background -->
   <div class="d-flex flex-column justify-content-center align-items-center hero-right">
     <div class="hero-bg position-absolute top-0 start-0 w-100 h-100"></div>
   </div>
-
 </div>
 
 <section class="features-section">
-  <h2>Meet your personalized wellness expert</h2>
-  <div class="d-flex justify-content-between gap-4 flex-wrap container">
+  <h2>Meet Your Wellness Assistant</h2>
+  <div class="d-flex justify-content-center gap-4 flex-wrap container">
     <div class="feature-column">
-      <h3>Document your data</h3>
+      <h3>📥 Document</h3>
       <ul>
-        <li>Upload your exercise record</li>
-        <li>Upload your diet records</li>
-        <li>Upload your sleep records</li>
-        <li>Log your energy levels</li>
+        <li>Log exercises, meals, and sleep</li>
+        <li>Track daily energy levels</li>
+        <li>Upload from CSVs</li>
       </ul>
     </div>
     <div class="feature-column">
-      <h3>Analyze your data</h3>
+      <h3>📊 Analyze</h3>
       <ul>
-        <li>Visualize trends through charts & graphs</li>
-        <li>AI-powered analysis to detect anomalies</li>
-        <li>Personalized health suggestions powered by large language models</li>
-        <li>Track your progress</li>
+        <li>Trends & insights via graphs</li>
+        <li>Smart recommendations</li>
+        <li>Custom data visualizations</li>
       </ul>
     </div>
     <div class="feature-column">
-      <h3>Share and stay motivated</h3>
+      <h3>🚀 Share</h3>
       <ul>
-        <li>Share your progress with friends</li>
-        <li>Comment and react to others’ logs</li>
-        <li>Export and share detailed reports</li>
-
+        <li>Motivate with social sharing</li>
+        <li>Export progress reports</li>
+        <li>Join challenges</li>
       </ul>
     </div>
   </div>
@@ -70,6 +64,7 @@
     <a href="{{ url_for('main.dashboard') if logged_in else url_for('main.login') }}" class="btn btn-outline">Explore All Features →</a>
   </div>
 </section>
+
 <footer class="site-footer bg-dark text-light text-center py-4 mt-5">
   <div class="container">
     <p class="mb-1">© 2025 FitTracker. All rights reserved.</p>
@@ -78,5 +73,4 @@
 </footer>
 
 <script src="{{ url_for('static', filename='js/index.js') }}"></script>
-
-{% endblock %}  
+{% endblock %}

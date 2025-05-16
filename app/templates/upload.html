@@ -3,6 +3,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/upload.css') }}">
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 
 <div class="container">
     <h1 class="text-center mb-4">Upload Your Fitness Data</h1>
@@ -22,22 +23,6 @@
     {% endwith %}
 </div>
 
-    <!-- Unified CSV Upload Form -->
-    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
-        <input type="hidden" name="category" id="csvCategory" value="exercise">
-
-        <div class="row justify-content-center mb-2 align-items-end">
-            <!-- File Input -->
-            <div class="col-md-6">
-                <label class="form-label">Upload CSV (auto-selects based on tab)</label>
-                <input type="file" name="csv_file" class="form-control" accept=".csv" required>
-            </div>
-            <!-- Submit Button -->
-            <div class="col-md-2 text-end mt-4">
-                <button type="submit" class="btn btn-success">Upload CSV</button>
-            </div>
-        </div>
-    </form>
 
     <!-- Tabs -->
     <ul class="nav nav-tabs mb-4 justify-content-center" id="uploadTabs" role="tablist">
@@ -55,6 +40,21 @@
     <!-- Tab Content -->
     <div class="tab-content" id="uploadTabsContent">
         <!-- Exercise Form -->
+         <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
+        <input type="hidden" name="category" id="csvCategory" value="exercise">
+
+        <div class="row justify-content-center mb-2 align-items-end">
+            <!-- File Input -->
+            <div class="col-md-6">
+                <label class="form-label">Upload CSV or add manually</label>
+                <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+            </div>
+            <!-- Submit Button -->
+            <div class="col-md-2 text-end mt-4">
+                <button type="submit" class="btn btn-success">Upload CSV</button>
+            </div>
+        </div>
+    </form>
         <div class="tab-pane fade show active" id="exercise" role="tabpanel">
             <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
                 <div class="mb-3">
@@ -98,8 +98,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Date</label>
-                    <input type="date" name="date" class="form-control" value="{{ date_default }}" required>
-                </div>
+<input type="date" name="date" class="form-control" value="{{ date_default }}" max="{{ date_default }}" required onkeydown="return false;">                </div>
                 <div class="mb-3">
                     <label class="form-label">Notes (optional)</label>
                     <textarea name="notes" class="form-control" rows="2"></textarea>
@@ -208,25 +207,4 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const hiddenInput = document.getElementById("csvCategory");
-        const tabButtons = document.querySelectorAll("#uploadTabs button");
-        tabButtons.forEach(button => {
-            button.addEventListener("click", () => {
-                const selectedTab = button.getAttribute("data-bs-target").substring(1); // "exercise", "diet", "sleep"
-                hiddenInput.value = selectedTab;
-            });
-        });
-
-        // JavaScript to auto-dismiss flash messages
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    alert.classList.remove('show');
-                    alert.classList.add('fade');
-                }, 2000);
-            });
-    });
-</script>
 {% endblock %}
