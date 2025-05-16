@@ -1,9 +1,4 @@
-body {
-    background: #d9a7c7;
-    background: -webkit-linear-gradient(to right, rgb(217, 167, 199), rgb(255, 252, 220));
-    background: linear-gradient(to right, rgb(217, 167, 199), rgb(255, 252, 220));
-    min-height: 100vh; /* Ensure gradient covers full viewport height */
-}
+
 
 .container-fluid {
     padding: 20px;
