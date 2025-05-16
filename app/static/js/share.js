@@ -63,7 +63,17 @@ function downloadAllCharts() {
     });
 }
 
-// 页面加载时初始化图表
+document.addEventListener('DOMContentLoaded', function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.classList.remove('show');
+            alert.classList.add('fade');
+        }, 2000);
+    });
+});
+
+// Initialize the chart when the page loads
 window.onload = function () {
     // Calculate macronutrient values
     const macronutrientValues = [
@@ -323,7 +333,7 @@ window.onload = function () {
         }
     }
 
-    // Download individual chart function - 使其在全局范围内可用
+    // Download individual chart function - Make it available globally
     window.downloadChart = function(chartId) {
         const chart = charts[chartId];
         if (chart) {
@@ -343,10 +353,10 @@ window.onload = function () {
         }
     };
 
-    // 将downloadChart也映射到全局作用域
+    // Map downloadChart to the global scope as well
     downloadChart = window.downloadChart;
 
-    // 初始化alert自动消失
+    // Initialization alert disappears automatically
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(alert => {
         setTimeout(() => {
