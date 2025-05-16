@@ -157,7 +157,9 @@
                                 <label for="receiver_email" class="form-label">Recipient mail address:</label>
                                 <input type="email" class="form-control" id="receiver_email" name="receiver_email" required>
                             </div>
+                            <div class="text-center">
                             <button type="submit" class="btn btn-primary">Share via Email</button>
+                            </div>
                         </form>
                     </div>
 
@@ -255,83 +257,4 @@
     </div>
 </div>
 
-<script>
-    // Copy Share Link function
-    function copyShareLink() {
-        const shareLink = document.getElementById('share-link');
-        shareLink.select();
-        document.execCommand('copy');
-
-        const copyMessage = document.getElementById('copy-message');
-        copyMessage.classList.remove('d-none');
-        setTimeout(() => {
-            copyMessage.classList.add('d-none');
-        }, 2000);
-    }
-
-    // Copy LinkedIn Text function
-    function copyLinkedInText() {
-        const tempInput = document.createElement('textarea');
-        tempInput.value = "Check out my fitness progress! {{ share_url }}";
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        alert('Text copied to clipboard! Just paste it in the LinkedIn post editor.');
-    }
-
-    // Download QR Code function
-    function downloadQRCode() {
-        const qrImage = document.querySelector('#qrcode img');
-        const qrUrl = qrImage.src.replace('size=200x200', 'size=400x400');
-        fetch(qrUrl)
-            .then(response => response.blob())
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'fitness-progress-qrcode.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            })
-            .catch(err => console.error('Error downloading QR code:', err));
-    }
-
-    // Download All Charts function
-    function downloadAllCharts() {
-        const chartIds = [
-            'DailyExerciseDurationChart',
-            'ExerciseIntensityLevelsChart',
-            'CaloriesBurnedperSessionChart',
-            'WeeklyExerciseFrequencyChart',
-            'DailyCaloricIntakeChart',
-            'MacronutrientBreakdownChart',
-            'WaterConsumptionChart',
-            'WeeklyMealFrequencyChart',
-            'DailySleepDurationChart',
-            'SleepQualityScoresChart',
-            'SleepTypeDistributionChart',
-            'SleepWakeupsChart'
-        ];
-
-        chartIds.forEach((chartId, index) => {
-            setTimeout(() => {
-                window.downloadChart(chartId);
-            }, index * 200); // Stagger downloads to ensure rendering
-        });
-    }
-
-    // Auto-dismiss flash messages after 2 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            setTimeout(() => {
-                alert.classList.remove('show');
-                alert.classList.add('fade');
-            }, 2000);
-        });
-    });
-</script>
 {% endblock %}

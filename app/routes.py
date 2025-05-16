@@ -623,9 +623,9 @@ def health_info(token):
 
     user_id = share_token.user_id
     user = User.query.get_or_404(user_id)
-    exercise_entries = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date.desc()).limit(5).all()
-    diet_entries = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date.desc()).limit(5).all()
-    sleep_entries = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start.desc()).limit(5).all()
+    exercise_entries = ExerciseEntry.query.filter_by(user_id=user_id).order_by(ExerciseEntry.date.desc()).all()
+    diet_entries = DietEntry.query.filter_by(user_id=user_id).order_by(DietEntry.date.desc()).all()
+    sleep_entries = SleepEntry.query.filter_by(user_id=user_id).order_by(SleepEntry.sleep_start.desc()).all()
 
     return render_template("health_info.html",
                            user=user,
