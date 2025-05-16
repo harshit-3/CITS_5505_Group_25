@@ -23,22 +23,6 @@
     {% endwith %}
 </div>
 
-    <!-- Unified CSV Upload Form -->
-    <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
-        <input type="hidden" name="category" id="csvCategory" value="exercise">
-
-        <div class="row justify-content-center mb-2 align-items-end">
-            <!-- File Input -->
-            <div class="col-md-6">
-                <label class="form-label">Upload CSV (Select the desire tab to uload csv)</label>
-                <input type="file" name="csv_file" class="form-control" accept=".csv" required>
-            </div>
-            <!-- Submit Button -->
-            <div class="col-md-2 text-end mt-4">
-                <button type="submit" class="btn btn-success">Upload CSV</button>
-            </div>
-        </div>
-    </form>
 
     <!-- Tabs -->
     <ul class="nav nav-tabs mb-4 justify-content-center" id="uploadTabs" role="tablist">
@@ -56,6 +40,21 @@
     <!-- Tab Content -->
     <div class="tab-content" id="uploadTabsContent">
         <!-- Exercise Form -->
+         <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="mb-4" id="csvForm">
+        <input type="hidden" name="category" id="csvCategory" value="exercise">
+
+        <div class="row justify-content-center mb-2 align-items-end">
+            <!-- File Input -->
+            <div class="col-md-6">
+                <label class="form-label">Upload CSV or add manually</label>
+                <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+            </div>
+            <!-- Submit Button -->
+            <div class="col-md-2 text-end mt-4">
+                <button type="submit" class="btn btn-success">Upload CSV</button>
+            </div>
+        </div>
+    </form>
         <div class="tab-pane fade show active" id="exercise" role="tabpanel">
             <form method="POST" action="{{ url_for('main.upload') }}" enctype="multipart/form-data" class="p-4 border rounded shadow-sm bg-light">
                 <div class="mb-3">
